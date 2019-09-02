@@ -1,0 +1,16 @@
+version: 0.8.2
+data_loading: TRUE
+data_loading_header: TRUE
+data_ignore: pbp/,*.csv,*.txt
+cache_loading: TRUE
+recursive_loading: TRUE
+munging: TRUE
+logging: TRUE
+logging_level: INFO
+load_libraries: TRUE
+libraries: log4r, plyr, rlang, tidymodels, tidyverse, purrrlyr, magrittr, lubridate, fs
+as_factors: TRUE
+data_tables: FALSE
+attach_internal_libraries: FALSE
+cache_loaded_data: FALSE
+sticky_variables: NONE

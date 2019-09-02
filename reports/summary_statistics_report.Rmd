@@ -1,0 +1,147 @@
+---
+title: "summary_statistics"
+author: "Niander Assis"
+date:
+output:
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, vspaceecho = "1em", vspaceout = "1em")
+knitr::opts_knit$set(root.dir = rprojroot::find_root(rprojroot::is_rstudio_project))
+
+hook_source_def = knitr::knit_hooks$get('source')
+knitr::knit_hooks$set(source = function(x, options) {
+  if (!is.null(options$vspaceecho)) {
+    begin <- paste0("\\vspace{", options$vspaceecho, "}")
+    stringr::str_c(begin, hook_source_def(x, options))
+  } else {
+    hook_source_def(x, options)
+  }
+})
+
+hook_output_def = knitr::knit_hooks$get('output')
+knitr::knit_hooks$set(output = function(x, options) {
+  if (!is.null(options$vspaceout)) {
+    end <- paste0("\\vspace{", options$vspaceout, "}")
+    stringr::str_c(hook_output_def(x, options), end)
+  } else {
+    hook_output_def(x, options)
+  }
+})
+```
+
+```{r source, include=FALSE}
+p_load(ProjectTemplate)
+load.project(munging = FALSE, cache_loading = FALSE)
+
+p_load(cowplot)
+theme_set(theme_cowplot(font_size = 12) +
+            theme(legend.position = "bottom", legend.justification = "center"))
+
+SaveGraph <- function(fname, plot = last_plot(), device = "pdf", width = 6, height = 4) {
+  ggsave(path(projroot, "graphs", fname),
+         plot = plot,
+         device = device, width = width, height = height)
+}
+
+year <- 2017
+
+```
+
+```{r, results = "hold"}
+timeout.data <- res.timeout.effect.data %>%
+  filter(treatment == "timeout", season == year) %>%
+  mutate(delta = factor(delta)) %>%
+  mutate_at(vars(slope.before, slope.after,infl.score),
+            funs(if_else(poss == "away", -1 * ., .)))
+
+plt <- timeout.data %>% 
+  ggplot(aes(infl.score, colour = delta, fill = delta, group = delta)) +
+  geom_vline(xintercept = 0) +
+  geom_density(data = filter(timeout.data, delta == 2), alpha = 0.15, adjust = 3, size = 1) +
+  geom_density(data = filter(timeout.data, delta == 4), alpha = 0.15, adjust = 2.4, size = 1) +
+  geom_density(data = filter(timeout.data, delta == 6), alpha = 0.15, adjust = 1.8, size = 1) +
+  #aes(y = stat(count/sum(count))) +
+  #geom_histogram(data = filter(timeout.data, delta == 2), binwidth = 0.5, size = 0.6, alpha = 0.2) +
+  #geom_histogram(data = filter(timeout.data, delta == 4), binwidth = 0.5, size = 0.6, alpha = 0.2) +
+  #geom_histogram(data = filter(timeout.data, delta == 6), binwidth = 0.5, size = 0.6, alpha = 0.2) +
+  #geom_freqpoly(data = filter(timeout.data, delta == 2), binwidth = 0.5, size = 1) +
+  #geom_freqpoly(data = filter(timeout.data, delta == 4), binwidth = 0.5, size = 1) +
+  #geom_freqpoly(data = filter(timeout.data, delta == 6), binwidth = 0.7, size = 1) +
+  labs(x = expression(italic("Short-term Momentum Change")~group("(",Y[t]^{lambda},")")),
+       y = "Density") +
+  labs(fill = expression(lambda),
+       colour = expression(lambda)) + 
+  scale_colour_viridis_d(option = "D", direction = 1, begin = 0, end = 0.85, aesthetics = c("colour", "fill")) +
+  theme_cowplot(font_size = 12) +
+            theme(#legend.position = "bottom",
+                  legend.direction = "vertical",
+                  legend.position = c(0.88,0.8),
+                  #legend.justification = "center",
+                  #legend.key = element_rect(size = 5),
+                  #legend.key.size = unit(1, 'lines'),
+                  #legend.key.size = unit(10, "pt"),
+                  legend.key.height=unit(1,"line"),
+                  legend.key.width = unit(1,"line"),
+                  #legend.spacing.y = unit(10, "pt"),
+                  legend.title.align = 0,
+                  plot.margin = unit(c(6,6,0,0), "pt"))
+
+plt
+
+SaveGraph("stmc-dist.pdf", height = 3.5)
+
+timeout.data %>%
+  group_by(delta) %>%
+  by_slice(function(df) {
+    df %>%
+      specify(response = "infl.score") %>%
+      hypothesize(null = "point", mu = 0) %>%
+      generate(reps = 1000) %>%
+      calculate(stat = "mean") %>%
+      get_pvalue(obs_stat = mean(df$infl.score), direction = "both")
+  }, .collate = "rows")
+
+timeout.data %>%
+  group_by(delta) %>%
+  by_slice(function(df) {
+    df %$%
+      wilcox.test(infl.score) %>%
+      broom::tidy()
+  }, .collate = "rows")
+
+
+timeout.data %>% 
+  group_by(delta) %>% 
+  do(add_column(n = length(.$infl.score),
+                as_tibble(t(quantile(.$infl.score, probs = c(0.25, 0.5, 0.75)))), 
+                mean = mean(.$infl.score), 
+                sd = sd(.$infl.score))) %>%
+  ungroup() %>% 
+  mutate_if(is.numeric, funs(round(., 3)))
+
+```
+
+```{r}
+load.project(munging = FALSE, cache_loading = TRUE)
+
+games.perposs.2017 %>%
+  summarise(n = n())
+
+games.perposs.2017 %>%
+  filter(kind == "timeout") %>%
+  group_by(poss) %>%
+  summarise(n = n())
+
+games.perposs.2017 %>%
+  filter(kind %in% c("official.timeout", "timeout")) %>%
+  group_by(kind) %>%
+  summarise(n = n())
+
+games.perposs.2017 %>%
+  filter(kind %in% c("official.timeout", "timeout")) %>%
+  summarise(n = n())
+
+```

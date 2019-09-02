@@ -1,0 +1,407 @@
+time,Chicago,pts.away,score,pts.home,New York
+12:00.0,Start of 1st quarter,,,,Start of 1st quarter
+12:00.0,Jump ball: C. Felicio vs. R. Lopez (K. Porzingis gains possession),,,,Jump ball: C. Felicio vs. R. Lopez (K. Porzingis gains possession)
+11:42.0,,,0-0,,J. Calderon misses 2-pt shot from 7 ft
+11:41.0,Defensive rebound by T. Gibson,,0-0,,
+11:23.0,J. Butler misses 2-pt shot from 12 ft,,0-0,,
+11:22.0,,,0-0,,Defensive rebound by J. Calderon
+11:08.0,,,0-3,3,S. Vujacic makes 3-pt shot from 24 ft
+10:51.0,C. Felicio misses 2-pt shot from 1 ft (block by R. Lopez),,0-3,,
+10:50.0,,,0-3,,Defensive rebound by K. Porzingis
+10:29.0,,,0-5,2,K. Porzingis makes 2-pt shot from 1 ft (assist by R. Lopez)
+10:13.0,D. Rose makes 2-pt shot from 20 ft,2,2-5,,
+9:59.0,,,2-5,,Turnover by R. Lopez (lost ball; steal by D. Rose)
+9:56.0,Shooting foul by J. Calderon (drawn by D. Rose),,2-5,,
+9:56.0,D. Rose makes free throw 1 of 2,1,3-5,,
+9:56.0,D. Rose makes free throw 2 of 2,1,4-5,,
+9:40.0,,,4-5,,Shooting foul by J. Butler (drawn by C. Anthony)
+9:40.0,,,4-6,1,C. Anthony makes free throw 1 of 2
+9:40.0,,,4-7,1,C. Anthony makes free throw 2 of 2
+9:22.0,T. Gibson makes 2-pt shot from 9 ft (assist by J. Butler),2,6-7,,
+9:14.0,,,6-7,,C. Anthony misses 3-pt shot from 24 ft
+9:13.0,Defensive rebound by M. Dunleavy,,6-7,,
+9:02.0,T. Gibson makes 2-pt shot from 6 ft (assist by M. Dunleavy),2,8-7,,
+8:45.0,,,8-9,2,R. Lopez makes 2-pt shot at rim (assist by S. Vujacic)
+8:32.0,M. Dunleavy misses 3-pt shot from 25 ft,,8-9,,
+8:31.0,,,8-9,,Defensive rebound by S. Vujacic
+8:18.0,,,8-12,3,C. Anthony makes 3-pt shot from 23 ft (assist by S. Vujacic)
+7:50.0,Shooting foul by C. Anthony (drawn by T. Gibson),,8-12,,
+7:50.0,T. Gibson makes free throw 1 of 2,1,9-12,,
+7:50.0,T. Gibson makes free throw 2 of 2,1,10-12,,
+7:33.0,,,10-12,,Turnover by J. Calderon (lost ball; steal by M. Dunleavy)
+7:24.0,Turnover by J. Butler (lost ball; steal by S. Vujacic),,10-12,,
+7:18.0,,,10-15,3,C. Anthony makes 3-pt shot from 25 ft (assist by S. Vujacic)
+7:07.0,Turnover by J. Butler (lost ball),,10-15,,
+6:54.0,,,10-15,,Turnover by S. Vujacic (traveling)
+6:41.0,C. Felicio makes 2-pt shot from 19 ft (assist by D. Rose),2,12-15,,
+6:30.0,,,12-15,,Turnover by R. Lopez (traveling)
+6:19.0,D. Rose makes 2-pt shot from 1 ft,2,14-15,,
+6:08.0,,,14-17,2,J. Calderon makes 2-pt shot from 1 ft
+5:59.0,T. Gibson misses 2-pt shot from 1 ft (block by K. Porzingis),,14-17,,
+5:58.0,,,14-17,,Defensive rebound by Team
+5:58.0,,,14-17,,New York full timeout
+5:41.0,,,14-19,2,C. Anthony makes 2-pt shot from 11 ft
+5:21.0,T. Gibson makes 2-pt shot from 1 ft,2,16-19,,
+5:02.0,,,16-22,3,S. Vujacic makes 3-pt shot from 24 ft
+4:50.0,D. Rose misses 2-pt shot from 13 ft,,16-22,,
+4:49.0,,,16-22,,Defensive rebound by C. Anthony
+4:44.0,Personal foul by T. Gibson,,16-22,,
+4:44.0,D. McDermott enters the game for M. Dunleavy,,16-22,,
+4:44.0,N. Mirotic enters the game for C. Felicio,,16-22,,
+4:44.0,,,16-22,,K. Seraphin enters the game for R. Lopez
+4:28.0,,,16-22,,K. Porzingis misses 3-pt shot from 23 ft
+4:28.0,Defensive rebound by T. Gibson,,16-22,,
+4:13.0,Turnover by J. Butler (lost ball; steal by J. Calderon),,16-22,,
+4:07.0,,,16-25,3,S. Vujacic makes 3-pt shot from 24 ft (assist by J. Calderon)
+4:04.0,Chicago full timeout,,16-25,,
+4:04.0,B. Portis enters the game for T. Gibson,,16-25,,
+4:04.0,,,16-25,,L. Galloway enters the game for J. Calderon
+3:50.0,J. Butler makes 2-pt shot from 10 ft,2,18-25,,
+3:26.0,,,18-25,,Turnover by C. Anthony (traveling)
+3:09.0,J. Butler makes 2-pt shot from 9 ft,2,20-25,,
+2:53.0,,,20-25,,S. Vujacic misses 2-pt shot from 3 ft
+2:52.0,,,20-25,,Offensive rebound by Team
+2:52.0,A. Brooks enters the game for D. Rose,,20-25,,
+2:52.0,,,20-25,,A. Afflalo enters the game for S. Vujacic
+2:43.0,,,20-25,,L. Galloway misses 3-pt shot from 24 ft
+2:42.0,Defensive rebound by Team,,20-25,,
+2:24.0,J. Butler makes 2-pt shot at rim (assist by B. Portis),2,22-25,,
+2:03.0,,,22-25,,K. Porzingis misses 2-pt shot from 9 ft
+2:02.0,,,22-25,,Offensive rebound by K. Seraphin
+1:57.0,,,22-27,2,K. Seraphin makes 2-pt shot from 8 ft
+1:43.0,N. Mirotic misses 2-pt shot from 1 ft (block by K. Seraphin),,22-27,,
+1:42.0,,,22-27,,Defensive rebound by L. Galloway
+1:36.0,,,22-27,,A. Afflalo misses 3-pt shot from 23 ft
+1:35.0,,,22-27,,Offensive rebound by K. Porzingis
+1:35.0,,,22-29,2,K. Porzingis makes 2-pt shot from 1 ft
+1:15.0,B. Portis misses 2-pt shot from 5 ft,,22-29,,
+1:14.0,Offensive rebound by N. Mirotic,,22-29,,
+1:14.0,Shooting foul by L. Galloway (drawn by N. Mirotic),,22-29,,
+1:14.0,N. Mirotic makes free throw 1 of 2,1,23-29,,
+1:14.0,J. Holiday enters the game for J. Butler,,23-29,,
+1:14.0,,,23-29,,D. Williams enters the game for K. Porzingis
+1:14.0,N. Mirotic makes free throw 2 of 2,1,24-29,,
+0:52.0,,,24-29,,Turnover by D. Williams (lost ball; steal by A. Brooks)
+0:48.0,Shooting foul by C. Anthony (drawn by D. McDermott),,24-29,,
+0:48.0,D. McDermott makes free throw 1 of 2,1,25-29,,
+0:48.0,,,25-29,,J. Grant enters the game for C. Anthony
+0:48.0,D. McDermott misses free throw 2 of 2,,25-29,,
+0:47.0,,,25-29,,Defensive rebound by K. Seraphin
+0:31.0,,,25-29,,K. Seraphin misses 2-pt shot from 5 ft
+0:29.0,Defensive rebound by J. Holiday,,25-29,,
+0:14.0,B. Portis misses 3-pt shot from 23 ft,,25-29,,
+0:13.0,,,25-29,,Defensive rebound by D. Williams
+0:04.0,,,25-29,,Shooting foul by N. Mirotic (drawn by D. Williams)
+0:04.0,,,25-30,1,D. Williams makes free throw 1 of 2
+0:04.0,,,25-31,1,D. Williams makes free throw 2 of 2
+0:00.0,A. Brooks makes 2-pt shot from 7 ft,2,27-31,,
+0:00.0,End of 1st quarter,,,,End of 1st quarter
+12:00.0,Start of 2nd quarter,,,,Start of 2nd quarter
+11:40.0,D. McDermott misses 2-pt shot from 10 ft,,27-31,,
+11:39.0,,,27-31,,Defensive rebound by D. Williams
+11:16.0,,,27-31,,K. Seraphin misses 2-pt shot from 11 ft
+11:15.0,Defensive rebound by J. Holiday,,27-31,,
+11:06.0,J. Holiday misses 2-pt shot from 1 ft,,27-31,,
+11:05.0,Offensive rebound by B. Portis,,27-31,,
+11:05.0,B. Portis misses 2-pt shot at rim,,27-31,,
+11:04.0,Offensive rebound by B. Portis,,27-31,,
+11:04.0,B. Portis misses 2-pt shot at rim,,27-31,,
+11:04.0,Offensive rebound by Team,,27-31,,
+11:04.0,,,27-31,,Personal foul by D. Williams
+11:04.0,,,27-31,,R. Lopez enters the game for K. Seraphin
+10:59.0,N. Mirotic misses 3-pt shot from 25 ft,,27-31,,
+10:58.0,,,27-31,,Defensive rebound by R. Lopez
+10:40.0,,,27-31,,D. Williams misses 2-pt shot from 10 ft
+10:39.0,Defensive rebound by B. Portis,,27-31,,
+10:29.0,D. McDermott misses 3-pt shot from 23 ft,,27-31,,
+10:28.0,,,27-31,,Defensive rebound by L. Galloway
+10:11.0,,,27-31,,Shooting foul by B. Portis (drawn by L. Galloway)
+10:11.0,,,27-32,1,L. Galloway makes free throw 1 of 3
+10:11.0,,,27-33,1,L. Galloway makes free throw 2 of 3
+10:11.0,,,27-34,1,L. Galloway makes free throw 3 of 3
+10:00.0,N. Mirotic misses 3-pt shot from 25 ft,,27-34,,
+9:54.0,,,27-34,,Defensive rebound by A. Afflalo
+9:51.0,,,27-36,2,A. Afflalo makes 2-pt shot from 9 ft
+9:38.0,A. Brooks misses 3-pt shot from 25 ft,,27-36,,
+9:38.0,,,27-36,,Defensive rebound by R. Lopez
+9:25.0,,,27-36,,Turnover by R. Lopez (traveling)
+9:25.0,D. Rose enters the game for A. Brooks,,27-36,,
+9:10.0,D. Rose misses 3-pt shot from 25 ft,,27-36,,
+9:09.0,,,27-36,,Defensive rebound by Team
+8:53.0,,,27-36,,R. Lopez misses 2-pt shot from 4 ft
+8:52.0,Defensive rebound by J. Holiday,,27-36,,
+8:45.0,D. McDermott misses 3-pt shot from 23 ft,,27-36,,
+8:44.0,Offensive rebound by N. Mirotic,,27-36,,
+8:44.0,N. Mirotic makes 2-pt shot at rim,2,29-36,,
+8:27.0,,,29-36,,D. Williams misses 3-pt shot from 24 ft
+8:26.0,Defensive rebound by J. Holiday,,29-36,,
+8:21.0,Offensive foul by N. Mirotic,,29-36,,
+8:21.0,Turnover by N. Mirotic (offensive foul),,29-36,,
+8:21.0,Official timeout,,29-36,,
+8:21.0,J. Butler enters the game for D. McDermott,,29-36,,
+8:21.0,M. Dunleavy enters the game for B. Portis,,29-36,,
+8:21.0,T. Gibson enters the game for J. Holiday,,29-36,,
+8:21.0,,,29-36,,K. Porzingis enters the game for D. Williams
+8:12.0,,,29-36,,K. Porzingis misses 2-pt shot from 16 ft
+8:11.0,Defensive rebound by Team,,29-36,,
+7:55.0,D. Rose makes 2-pt shot from 19 ft,2,31-36,,
+7:45.0,Personal foul by T. Gibson,,31-36,,
+7:33.0,,,31-36,,K. Porzingis misses 2-pt shot from 6 ft
+7:32.0,Defensive rebound by T. Gibson,,31-36,,
+7:21.0,D. Rose makes 2-pt shot from 20 ft (assist by N. Mirotic),2,33-36,,
+7:09.0,,,33-36,,J. Grant misses 3-pt shot from 25 ft
+7:08.0,Defensive rebound by Team,,33-36,,
+6:51.0,M. Dunleavy misses 2-pt shot from 21 ft,,33-36,,
+6:50.0,,,33-36,,Defensive rebound by A. Afflalo
+6:42.0,,,33-38,2,J. Grant makes 2-pt shot from 1 ft
+6:24.0,M. Dunleavy misses 2-pt shot from 4 ft (block by L. Galloway),,33-38,,
+6:23.0,,,33-38,,Defensive rebound by K. Porzingis
+6:14.0,,,33-38,,J. Grant misses 3-pt shot from 25 ft
+6:13.0,Defensive rebound by N. Mirotic,,33-38,,
+6:02.0,D. Rose makes 2-pt shot at rim (assist by J. Butler),2,35-38,,
+5:55.0,,,35-38,,New York full timeout
+5:55.0,,,35-38,,S. Vujacic enters the game for L. Galloway
+5:55.0,,,35-38,,J. Calderon enters the game for A. Afflalo
+5:55.0,,,35-38,,C. Anthony enters the game for J. Grant
+5:45.0,,,35-40,2,K. Porzingis makes 2-pt shot from 20 ft
+5:33.0,M. Dunleavy misses 3-pt shot from 25 ft,,35-40,,
+5:32.0,,,35-40,,Defensive rebound by K. Porzingis
+5:18.0,,,35-42,2,C. Anthony makes 2-pt shot from 18 ft
+5:06.0,Shooting foul by S. Vujacic (drawn by J. Butler),,35-42,,
+5:06.0,J. Butler makes free throw 1 of 2,1,36-42,,
+5:06.0,J. Butler misses free throw 2 of 2,,36-42,,
+5:04.0,,,36-42,,Defensive rebound by C. Anthony
+5:00.0,,,36-42,,Turnover by C. Anthony (lost ball; steal by D. Rose)
+4:57.0,D. Rose misses 3-pt shot from 24 ft,,36-42,,
+4:56.0,,,36-42,,Defensive rebound by Team
+4:56.0,Loose ball foul by N. Mirotic,,36-42,,
+4:56.0,B. Portis enters the game for N. Mirotic,,36-42,,
+4:43.0,,,36-45,3,J. Calderon makes 3-pt shot from 22 ft (assist by C. Anthony)
+4:21.0,M. Dunleavy makes 3-pt shot from 25 ft (assist by T. Gibson),3,39-45,,
+4:00.0,,,39-45,,Turnover by S. Vujacic (lost ball; steal by J. Butler)
+3:53.0,D. Rose makes 2-pt shot at rim,2,41-45,,
+3:32.0,,,41-47,2,R. Lopez makes 2-pt shot from 19 ft (assist by J. Calderon)
+3:21.0,J. Butler makes 2-pt shot from 17 ft,2,43-47,,
+3:09.0,,,43-47,,C. Anthony misses 3-pt shot from 25 ft
+3:08.0,Defensive rebound by B. Portis,,43-47,,
+2:56.0,D. Rose misses 2-pt shot from 8 ft,,43-47,,
+2:55.0,,,43-47,,Defensive rebound by K. Porzingis
+2:48.0,,,43-47,,J. Calderon misses 3-pt shot from 25 ft
+2:47.0,Defensive rebound by T. Gibson,,43-47,,
+2:35.0,T. Gibson makes 2-pt shot from 1 ft,2,45-47,,
+2:17.0,,,45-47,,S. Vujacic misses 2-pt shot from 19 ft
+2:17.0,Defensive rebound by T. Gibson,,45-47,,
+2:02.0,T. Gibson misses 2-pt shot from 2 ft,,45-47,,
+2:02.0,,,45-47,,Defensive rebound by K. Porzingis
+1:51.0,,,45-50,3,K. Porzingis makes 3-pt shot from 27 ft (assist by C. Anthony)
+1:50.0,Chicago full timeout,,45-50,,
+1:50.0,C. Felicio enters the game for T. Gibson,,45-50,,
+1:50.0,,,45-50,,A. Afflalo enters the game for S. Vujacic
+1:34.0,D. Rose misses 2-pt shot from 19 ft,,45-50,,
+1:34.0,,,45-50,,Defensive rebound by K. Porzingis
+1:21.0,,,45-53,3,K. Porzingis makes 3-pt shot from 26 ft (assist by C. Anthony)
+1:09.0,Turnover by M. Dunleavy (lost ball),,45-53,,
+0:57.0,Personal foul by D. Rose,,45-53,,
+0:43.0,,,45-53,,Turnover by Team (shot clock)
+0:28.0,J. Butler misses 3-pt shot from 24 ft,,45-53,,
+0:28.0,,,45-53,,Defensive rebound by A. Afflalo
+0:04.0,,,45-53,,J. Calderon misses 2-pt shot from 10 ft
+0:03.0,Defensive rebound by C. Felicio,,45-53,,
+0:00.0,End of 2nd quarter,,,,End of 2nd quarter
+12:00.0,Start of 3rd quarter,,,,Start of 3rd quarter
+11:48.0,J. Butler misses 2-pt shot from 5 ft,,45-53,,
+11:47.0,,,45-53,,Defensive rebound by C. Anthony
+11:30.0,,,45-53,,Shooting foul by T. Gibson (drawn by K. Porzingis)
+11:30.0,,,45-54,1,K. Porzingis makes free throw 1 of 2
+11:30.0,,,45-55,1,K. Porzingis makes free throw 2 of 2
+11:06.0,C. Felicio misses 2-pt shot from 20 ft,,45-55,,
+11:04.0,Offensive rebound by Team,,45-55,,
+10:53.0,T. Gibson misses 2-pt shot from 4 ft (block by K. Porzingis),,45-55,,
+10:52.0,,,45-55,,Defensive rebound by J. Calderon
+10:48.0,,,45-55,,C. Anthony misses 3-pt shot from 25 ft
+10:48.0,Defensive rebound by Team,,45-55,,
+10:24.0,Turnover by J. Butler (lost ball; steal by S. Vujacic),,45-55,,
+10:20.0,,,45-55,,Shooting foul by J. Butler (drawn by J. Calderon)
+10:20.0,,,45-55,,J. Calderon misses free throw 1 of 2
+10:20.0,,,45-55,,Offensive rebound by Team
+10:20.0,,,45-56,1,J. Calderon makes free throw 2 of 2
+10:02.0,M. Dunleavy misses 2-pt shot from 19 ft,,45-56,,
+10:02.0,,,45-56,,Defensive rebound by K. Porzingis
+9:41.0,,,45-56,,C. Anthony misses 3-pt shot from 24 ft
+9:40.0,Defensive rebound by M. Dunleavy,,45-56,,
+9:20.0,D. Rose misses 2-pt shot from 3 ft,,45-56,,
+9:19.0,Offensive rebound by T. Gibson,,45-56,,
+9:16.0,T. Gibson misses 2-pt shot from 2 ft (block by R. Lopez),,45-56,,
+9:14.0,,,45-56,,Defensive rebound by R. Lopez
+9:12.0,Technical foul by Team,,45-56,,
+9:12.0,,,45-57,1,C. Anthony makes technical free throw
+8:53.0,,,45-57,,K. Porzingis misses 3-pt shot from 23 ft
+8:52.0,Defensive rebound by J. Butler,,45-57,,
+8:44.0,Shooting foul by K. Porzingis (drawn by J. Butler),,45-57,,
+8:44.0,J. Butler makes free throw 1 of 2,1,46-57,,
+8:44.0,J. Butler makes free throw 2 of 2,1,47-57,,
+8:25.0,,,47-57,,Turnover by J. Calderon (lost ball; steal by T. Gibson)
+8:13.0,D. Rose makes 2-pt shot from 16 ft,2,49-57,,
+7:58.0,,,49-59,2,K. Porzingis makes 2-pt shot from 14 ft
+7:58.0,,,49-59,,Shooting foul by T. Gibson (drawn by K. Porzingis)
+7:58.0,N. Mirotic enters the game for T. Gibson,,49-59,,
+7:58.0,,,49-60,1,K. Porzingis makes free throw 1 of 1
+7:35.0,D. Rose misses 2-pt shot from 21 ft,,49-60,,
+7:35.0,,,49-60,,Defensive rebound by R. Lopez
+7:10.0,,,49-60,,C. Anthony misses 2-pt shot from 22 ft
+7:09.0,Defensive rebound by D. Rose,,49-60,,
+7:06.0,D. Rose makes 2-pt shot from 1 ft,2,51-60,,
+6:52.0,,,51-60,,Turnover by K. Porzingis (lost ball; steal by J. Butler)
+6:46.0,J. Butler misses 2-pt shot from 22 ft,,51-60,,
+6:45.0,,,51-60,,Defensive rebound by J. Calderon
+6:31.0,,,51-60,,C. Anthony misses 2-pt shot from 1 ft (block by C. Felicio)
+6:29.0,,,51-60,,Offensive rebound by C. Anthony
+6:29.0,,,51-62,2,C. Anthony makes 2-pt shot from 1 ft
+6:29.0,,,51-62,,Violation by Team (jump ball)
+6:20.0,Shooting foul by K. Porzingis (drawn by N. Mirotic),,51-62,,
+6:20.0,N. Mirotic makes free throw 1 of 2,1,52-62,,
+6:20.0,,,52-62,,A. Afflalo enters the game for S. Vujacic
+6:20.0,D. McDermott enters the game for M. Dunleavy,,52-62,,
+6:20.0,N. Mirotic makes free throw 2 of 2,1,53-62,,
+6:03.0,,,53-62,,J. Calderon misses 2-pt shot from 11 ft
+6:03.0,Defensive rebound by D. Rose,,53-62,,
+5:51.0,D. Rose makes 2-pt shot from 1 ft,2,55-62,,
+5:32.0,,,55-62,,Shooting foul by J. Butler (drawn by C. Anthony)
+5:32.0,,,55-62,,New York full timeout
+5:32.0,,,55-63,1,C. Anthony makes free throw 1 of 2
+5:32.0,,,55-64,1,C. Anthony makes free throw 2 of 2
+5:17.0,N. Mirotic misses 2-pt shot at rim,,55-64,,
+5:15.0,,,55-64,,Defensive rebound by R. Lopez
+5:00.0,,,55-64,,K. Porzingis misses 3-pt shot from 24 ft
+4:59.0,Defensive rebound by J. Butler,,55-64,,
+4:51.0,N. Mirotic misses 3-pt shot from 25 ft,,55-64,,
+4:50.0,,,55-64,,Defensive rebound by J. Calderon
+4:30.0,,,55-66,2,K. Porzingis makes 2-pt shot from 17 ft (assist by A. Afflalo)
+4:17.0,J. Butler misses 2-pt shot from 20 ft,,55-66,,
+4:16.0,,,55-66,,Defensive rebound by R. Lopez
+4:02.0,,,55-66,,C. Anthony misses 3-pt shot from 24 ft
+4:01.0,Defensive rebound by N. Mirotic,,55-66,,
+3:47.0,D. Rose misses 3-pt shot from 26 ft,,55-66,,
+3:46.0,,,55-66,,Defensive rebound by C. Anthony
+3:35.0,,,55-68,2,A. Afflalo makes 2-pt shot from 1 ft
+3:35.0,Chicago full timeout,,55-68,,
+3:35.0,A. Brooks enters the game for D. Rose,,55-68,,
+3:19.0,C. Felicio makes 2-pt shot from 18 ft,2,57-68,,
+3:03.0,,,57-68,,J. Calderon misses 3-pt shot from 25 ft
+3:02.0,,,57-68,,Offensive rebound by J. Calderon
+2:47.0,,,57-71,3,J. Calderon makes 3-pt shot from 24 ft (assist by C. Anthony)
+2:23.0,C. Felicio makes 2-pt shot at rim (assist by N. Mirotic),2,59-71,,
+2:05.0,,,59-73,2,C. Anthony makes 2-pt shot from 17 ft (assist by A. Afflalo)
+1:51.0,A. Brooks makes 2-pt shot from 10 ft,2,61-73,,
+1:35.0,,,61-75,2,A. Afflalo makes 2-pt shot from 20 ft (assist by J. Calderon)
+1:15.0,J. Butler makes 3-pt shot from 25 ft,3,64-75,,
+0:59.0,,,64-78,3,A. Afflalo makes 3-pt shot from 24 ft (assist by J. Calderon)
+0:44.0,Shooting foul by R. Lopez (drawn by J. Butler),,64-78,,
+0:44.0,J. Butler misses free throw 1 of 2,,64-78,,
+0:44.0,Offensive rebound by Team,,64-78,,
+0:44.0,,,64-78,,J. Grant enters the game for J. Calderon
+0:44.0,J. Holiday enters the game for D. McDermott,,64-78,,
+0:44.0,J. Butler makes free throw 2 of 2,1,65-78,,
+0:30.0,,,65-78,,K. Porzingis misses 2-pt shot from 2 ft
+0:29.0,Defensive rebound by N. Mirotic,,65-78,,
+0:11.0,A. Brooks misses 2-pt shot from 3 ft (block by R. Lopez),,65-78,,
+0:11.0,Offensive rebound by Team,,65-78,,
+0:08.0,J. Butler misses 2-pt shot from 16 ft,,65-78,,
+0:08.0,,,65-78,,Defensive rebound by R. Lopez
+0:00.0,,,65-80,2,A. Afflalo makes 2-pt shot from 22 ft
+0:00.0,End of 3rd quarter,,,,End of 3rd quarter
+12:00.0,Start of 4th quarter,,,,Start of 4th quarter
+11:46.0,,,65-80,,A. Afflalo misses 2-pt shot from 9 ft
+11:43.0,Defensive rebound by N. Mirotic,,65-80,,
+11:29.0,A. Brooks makes 2-pt shot from 19 ft,2,67-80,,
+11:10.0,,,67-83,3,D. Williams makes 3-pt shot from 25 ft (assist by L. Galloway)
+10:46.0,N. Mirotic makes 2-pt shot from 2 ft (assist by J. Holiday),2,69-83,,
+10:27.0,,,69-85,2,J. Grant makes 2-pt shot from 10 ft (assist by K. Seraphin)
+10:08.0,N. Mirotic misses 2-pt shot from 20 ft,,69-85,,
+10:08.0,,,69-85,,Defensive rebound by K. Seraphin
+10:00.0,,,69-85,,Turnover by J. Grant (lost ball; steal by J. Holiday)
+9:54.0,J. Holiday makes 2-pt shot at rim (assist by N. Mirotic),2,71-85,,
+9:37.0,,,71-85,,Turnover by A. Afflalo (traveling)
+9:24.0,J. Holiday misses 3-pt shot from 25 ft,,71-85,,
+9:23.0,,,71-85,,Defensive rebound by L. Galloway
+9:07.0,,,71-85,,D. Williams misses 3-pt shot from 24 ft
+9:06.0,Defensive rebound by J. Holiday,,71-85,,
+8:57.0,J. Holiday makes 3-pt shot from 24 ft (assist by A. Brooks),3,74-85,,
+8:57.0,,,74-85,,New York full timeout
+8:39.0,,,74-85,,A. Afflalo misses 2-pt shot from 21 ft
+8:37.0,Defensive rebound by A. Brooks,,74-85,,
+8:31.0,Turnover by B. Portis (step out of bounds),,74-85,,
+8:14.0,,,74-85,,Turnover by K. Seraphin (traveling)
+8:00.0,D. Rose misses 2-pt shot from 2 ft (block by K. Seraphin),,74-85,,
+7:59.0,Offensive rebound by A. Brooks,,74-85,,
+7:56.0,A. Brooks misses 3-pt shot from 22 ft,,74-85,,
+7:55.0,,,74-85,,Defensive rebound by L. Galloway
+7:52.0,,,74-87,2,L. Galloway makes 2-pt shot at rim
+7:52.0,,,74-87,,Shooting foul by J. Holiday (drawn by L. Galloway)
+7:52.0,,,74-87,,R. Lopez enters the game for K. Seraphin
+7:52.0,,,74-87,,J. Calderon enters the game for J. Grant
+7:52.0,J. Butler enters the game for J. Holiday,,74-87,,
+7:52.0,,,74-88,1,L. Galloway makes free throw 1 of 1
+7:34.0,N. Mirotic misses 2-pt shot from 7 ft,,74-88,,
+7:32.0,,,74-88,,Defensive rebound by J. Calderon
+7:29.0,,,74-90,2,D. Williams makes 2-pt shot at rim (assist by J. Calderon)
+7:27.0,Chicago full timeout,,74-90,,
+7:27.0,T. Gibson enters the game for N. Mirotic,,74-90,,
+7:27.0,M. Dunleavy enters the game for B. Portis,,74-90,,
+7:17.0,D. Rose makes 2-pt shot from 18 ft,2,76-90,,
+6:55.0,,,76-90,,A. Afflalo misses 2-pt shot from 4 ft (block by J. Butler)
+6:54.0,Defensive rebound by A. Brooks,,76-90,,
+6:51.0,,,76-90,,Personal foul by J. Calderon
+6:41.0,J. Butler misses 2-pt shot from 16 ft,,76-90,,
+6:40.0,,,76-90,,Defensive rebound by D. Williams
+6:34.0,,,76-90,,Turnover by R. Lopez (3 sec)
+6:22.0,D. Rose makes 2-pt shot from 1 ft,2,78-90,,
+6:22.0,Shooting foul by R. Lopez (drawn by D. Rose),,78-90,,
+6:22.0,,,78-90,,Technical foul by Team
+6:22.0,D. Rose misses technical free throw,,78-90,,
+6:22.0,Offensive rebound by Team,,78-90,,
+6:22.0,,,78-90,,C. Anthony enters the game for L. Galloway
+6:22.0,D. Rose makes free throw 1 of 1,1,79-90,,
+5:58.0,,,79-92,2,C. Anthony makes 2-pt shot from 20 ft
+5:46.0,Turnover by D. Rose (lost ball; steal by C. Anthony),,79-92,,
+5:34.0,,,79-92,,R. Lopez misses 2-pt shot from 9 ft
+5:33.0,Defensive rebound by M. Dunleavy,,79-92,,
+5:26.0,A. Brooks misses 3-pt shot from 26 ft,,79-92,,
+5:25.0,,,79-92,,Defensive rebound by C. Anthony
+5:08.0,,,79-94,2,D. Williams makes 2-pt shot from 18 ft
+4:52.0,,,79-94,,Violation by R. Lopez (kicked ball)
+4:52.0,J. Holiday enters the game for A. Brooks,,79-94,,
+4:46.0,J. Butler makes 2-pt shot at rim (assist by M. Dunleavy),2,81-94,,
+4:27.0,,,81-94,,Turnover by A. Afflalo (traveling)
+4:13.0,D. Rose makes 2-pt shot from 17 ft,2,83-94,,
+4:13.0,,,83-94,,New York full timeout
+4:13.0,,,83-94,,K. Porzingis enters the game for R. Lopez
+3:57.0,,,83-97,3,J. Calderon makes 3-pt shot from 24 ft
+3:43.0,D. Rose misses 2-pt shot from 19 ft,,83-97,,
+3:43.0,,,83-97,,Defensive rebound by J. Calderon
+3:29.0,,,83-100,3,C. Anthony makes 3-pt shot from 24 ft (assist by J. Calderon)
+3:29.0,Chicago full timeout,,83-100,,
+3:15.0,M. Dunleavy makes 3-pt shot from 24 ft (assist by D. Rose),3,86-100,,
+2:52.0,,,86-102,2,D. Williams makes 2-pt shot from 1 ft
+2:36.0,J. Butler makes 2-pt shot at rim,2,88-102,,
+2:12.0,,,88-102,,K. Porzingis misses 2-pt shot from 19 ft
+2:12.0,,,88-102,,Offensive rebound by C. Anthony
+2:00.0,,,88-104,2,D. Williams makes 2-pt shot at rim (assist by J. Calderon)
+1:55.0,M. Dunleavy makes 3-pt shot from 23 ft (assist by D. Rose),3,91-104,,
+1:41.0,,,91-104,,C. Anthony misses 3-pt shot from 23 ft
+1:40.0,Defensive rebound by M. Dunleavy,,91-104,,
+1:29.0,D. Rose makes 3-pt shot from 25 ft (assist by J. Butler),3,94-104,,
+1:21.0,Personal foul by M. Dunleavy,,94-104,,
+1:21.0,A. Brooks enters the game for J. Holiday,,94-104,,
+1:13.0,,,94-104,,Turnover by D. Williams (lost ball; steal by J. Butler)
+1:10.0,,,94-104,,Personal foul by J. Calderon
+1:00.0,A. Brooks misses 2-pt shot from 14 ft (block by K. Porzingis),,94-104,,
+0:59.0,Offensive rebound by Team,,94-104,,
+0:56.0,M. Dunleavy misses 3-pt shot from 26 ft,,94-104,,
+0:56.0,Offensive rebound by J. Butler,,94-104,,
+0:50.0,J. Butler misses 3-pt shot from 24 ft,,94-104,,
+0:50.0,,,94-104,,Defensive rebound by K. Porzingis
+0:27.0,,,94-106,2,C. Anthony makes 2-pt shot from 10 ft
+0:13.0,M. Dunleavy misses 3-pt shot from 23 ft,,94-106,,
+0:12.0,,,94-106,,Defensive rebound by K. Porzingis
+0:00.0,End of 4th quarter,,,,End of 4th quarter

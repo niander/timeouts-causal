@@ -1,0 +1,830 @@
+---
+title: "causal_inference"
+author: "Niander Assis"
+date:
+output: 
+  html_document:
+    fig_width: 9
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE, vspaceecho = "1em", vspaceout = "1em")
+knitr::opts_knit$set(root.dir = rprojroot::find_root(rprojroot::is_rstudio_project))
+
+hook_source_def = knitr::knit_hooks$get('source')
+knitr::knit_hooks$set(source = function(x, options) {
+  if (!is.null(options$vspaceecho)) {
+    begin <- paste0("\\vspace{", options$vspaceecho, "}")
+    stringr::str_c(begin, hook_source_def(x, options))
+  } else {
+    hook_source_def(x, options)
+  }
+})
+
+hook_output_def = knitr::knit_hooks$get('output')
+knitr::knit_hooks$set(output = function(x, options) {
+  if (!is.null(options$vspaceout)) {
+    end <- paste0("\\vspace{", options$vspaceout, "}")
+    stringr::str_c(hook_output_def(x, options), end)
+  } else {
+    hook_output_def(x, options)
+  }
+})
+
+```
+
+```{r source, echo = FALSE, include = FALSE}
+source("src/causal_inference.R")
+source("src/results_functions.R")
+# p_load(gridExtra)
+# p_load(gtable)
+# p_load(grid)
+p_load(cowplot)
+
+theme_set(theme_cowplot(font_size = 12) +
+            theme(legend.position = "bottom", legend.justification = "center"))
+#theme_set(theme_gray() + 
+#            theme(legend.position = "bottom", legend.justification = "center"))
+
+JUST_HOME = TRUE
+SAVE_OUTPUT = TRUE
+
+methods =  c("nobal", "maha", "propensity.nocalip", "propensity")
+year <- c("2017")
+JoinAllMatchesAndDeltaWithData(year, methods, data = res.timeout.effect.data)
+
+methods =  c("nobal", "maha", "propensity.nocalip")
+all.mat <- env_get_list(global_env(), nms = str_c("mat", methods, sep = ".")) %>%
+  modify(~ drop_na(., match.id)) %>%
+  set_names(methods) %>%
+  bind_rows(.id = "method") %>%
+  mutate(method = fct_relevel(method, !!!methods))
+
+PrintTableOnes <- function(df, xvars = .(slope.before, quarter, seconds, margin), print.it = F) {
+  tabones <- list()
+  i <- 1
+  for(dta in config$deltas) {
+    if (print.it) print(str_glue("===========================\ndelta: {dta}"))
+    data <- df %>% filter(delta == dta)
+    ddply(data, .(match.poss), function(d) {
+      if(JUST_HOME) {
+        if(d$match.poss[1] != "home") return()
+      }
+      tab.one <- CreateTableOne(vars = as.character(xvars), strata = c("treatment"), data = d, test = F)
+      if (print.it) print(str_glue("poss:  {d$match.poss[1]}"))
+      l <- print(tab.one, noSpaces = T, smd = T, printToggle = print.it)
+      #tabones <<- list_merge(tabones, !!str_c(dta, d$match.poss[1]) := as.matrix(l))
+      tabones[[i]] <<- l
+      i <<- i + 1
+      return(NULL)
+    })
+  }
+  if (print.it) print(str_glue("==========================="))
+  return(invisible(tabones))
+}
+
+PrintTableOnesUnify <- function(df, xvars = .(slope.before, quarter, seconds, margin), print.it = F) {
+  df %<>%
+    mutate_at(vars(slope.before, slope.after, infl.score), funs(if_else(match.poss == "away", -1 * ., .)))
+  tabones <- list()
+  i <- 1
+  for(dta in config$deltas) {
+    if (print.it) print(str_glue("===========================\ndelta: {dta}"))
+    d <- df %>% filter(delta == dta)
+    tab.one <- CreateTableOne(vars = as.character(xvars), strata = c("treatment"), data = d, test = F)
+    l <- print(tab.one, noSpaces = T, smd = T, printToggle = print.it)
+    #tabones <<- list_merge(tabones, !!str_c(dta, d$match.poss[1]) := as.matrix(l))
+    tabones[[i]] <- l
+    i <- i + 1
+  }
+  if (print.it) print(str_glue("==========================="))
+  return(invisible(tabones))
+}
+
+p_load(brew)
+
+BrewTableOne <- function(tab.ones, suffix.name) {
+  deltas <- config$deltas
+  brew.tab.ones <- "\\begin{tabular}{ccccccc} \\toprule
+  <% for(i in 1:length(tab.ones)) { -%>
+  <% tab <- tab.ones[[i]] -%>
+  $\\lambda$ = <%= deltas[[i]] %> & control & timeout & SMD \\\\ \\midrule
+  n & <%= tab[1,1] %> & <%= tab[1,2] %> & ---\\\\
+  \\stmcB (mean (sd)) & <%= tab[2,1] %> & <%= tab[2,2] %> & <%= tab[2,3] %> \\\\
+  quarter (mean (sd)) & <%= tab[3,1] %> & <%= tab[3,2] %> & <%= tab[3,3] %> \\\\
+  seconds (mean (sd)) & <%= tab[4,1] %> & <%= tab[4,2] %> & <%= tab[4,3] %> \\\\
+  $P_i$ (mean (sd)) & <%= tab[5,1] %> & <%= tab[5,2] %> & <%= tab[5,3] %> \\\\ <% if(i < length(tab.ones)) { -%> 
+  \\midrule
+  <% } %>
+  <% } -%>
+  \\bottomrule
+  \\end{tabular}%"
+  if(SAVE_OUTPUT) brew(text = brew.tab.ones, output = path("reports", str_c("latex.table", suffix.name, "txt", sep = ".")))
+}
+
+
+SaveGraph <- function(fname, plot = last_plot(), device = "pdf", width = 7.28, height = 5) {
+  if(SAVE_OUTPUT) ggsave(path("graphs", fname),
+                         plot = plot,
+                         device = device, width = width, height = height)
+}
+
+```
+
+# Prior Matching
+```{r}
+tabs <- PrintTableOnes(mat.nobal)
+BrewTableOne(tabs, str_c("nomat", year, sep = "."))
+tabs <- PrintTableOnesUnify(mat.nobal)
+BrewTableOne(tabs, str_c("nomat", year, "unify", sep = "."))
+```
+
+# After no balance matching
+```{r}
+tabs <- PrintTableOnes(mat.nobal %>% drop_na(match.id))
+BrewTableOne(tabs, str_c("nobal", year, sep = "."))
+tabs <- PrintTableOnesUnify(mat.nobal %>% drop_na(match.id))
+BrewTableOne(tabs, str_c("nobal", year, "unify", sep = "."))
+```
+
+# After Matching maha
+```{r}
+tabs <- PrintTableOnes(mat.maha %>% drop_na(match.id))
+BrewTableOne(tabs, str_c("maha", year, sep = "."))
+tabs <- PrintTableOnesUnify(mat.maha %>% drop_na(match.id))
+BrewTableOne(tabs, str_c("maha", year, "unify", sep = "."))
+```
+
+# After Matchin Maha with replacement
+```{r}
+#PrintTableOnes(mat.maha %>% drop_na(match.id))
+```
+
+# After Matching propensity no caliper
+```{r}
+tabs <- PrintTableOnes(mat.propensity.nocalip %>% drop_na(match.id))
+BrewTableOne(tabs, str_c("propensity.nocalip", year, sep = "."))
+tabs <- PrintTableOnesUnify(mat.propensity.nocalip %>% drop_na(match.id))
+BrewTableOne(tabs, str_c("propensity.nocalip", year, "unify", sep = "."))
+```
+
+# After Matching propensity with caliper
+```{r}
+tabs <- PrintTableOnes(mat.propensity %>% drop_na(match.id))
+BrewTableOne(tabs, str_c("propensity", year, sep = "."))
+tabs <- PrintTableOnesUnify(mat.propensity %>% drop_na(match.id))
+BrewTableOne(tabs, str_c("propensity", year, "unify", sep = "."))
+```
+
+# All tables
+
+```{r}
+BrewBigTableOne <- function(tab.ones, suffix.name) {
+  qtd.methods <- length(methods) + 1 #plus 1 for unmatch
+  qtd.deltas <- length(config$deltas)
+  tab.deltas <- rep(config$deltas, each = qtd.methods)
+  methods <- c("unmatch", methods)
+  tab.methods <- methods %>%
+    as_list() %>%
+    set_names(methods) %>%
+    list_modify(unmatch = "Before Matching", nobal = "No-balance", 
+                maha = "Mahalanobis", propensity.nocalip = "Propensity",
+                propensity = "Propensity with caliper") %>%
+    squash_chr() %>%
+    extract(methods) %>%
+    rep(length(config$deltas))
+  
+  if(SAVE_OUTPUT) brew(file=str_c(rprojroot::find_root(rprojroot::is_rstudio_project), "/lib/", "tab.ones.brew"), 
+                       output = str_c("latex.table", suffix.name, "txt", sep = "."))
+}
+
+all.tab.ones <- all.mat %>%
+  mutate_at(vars(method), as.character) %>%
+  bind_rows(mat.nobal %>% mutate(method = "unmatch")) %>%
+  mutate(method = fct_relevel(method, c("unmatch", methods))) %>%
+  dlply(.(method), function(df) {
+    PrintTableOnesUnify(df, print.it = F)
+  }) %>%
+  transpose() %>%
+  flatten()
+
+BrewBigTableOne(all.tab.ones, str_c("all.methods", year, sep = "."))
+
+```
+
+# SMD comparisson
+
+```{r, results = "hold"}
+xvars = exprs(quarter, seconds, margin)
+plot.data <- bind_rows(all.mat,
+                       mat.nobal %>% mutate(method = "unmatch")) %>%
+  group_by(method, delta) %>%
+  do(tableone = as.data.frame(t(ExtractSmd(CreateTableOne(vars = as.character(xvars), strata = "A", data = ., test = F))))) %>%
+  unnest(tableone)
+
+plot.data %<>%
+  gather(key = "var", value = "smd", !!!xvars)
+
+plt <- plot.data %>% 
+  #filter(!JUST_HOME | match.poss == "home") %>%
+  ggplot(aes(x = method)) +
+  geom_point(aes(y=smd, color = var)) +
+  geom_line(aes(y=smd, color = var, group = var)) +
+  scale_x_discrete(limits = c("unmatch", methods)) +
+  geom_hline(yintercept = 0.1, linetype = 2, size = 0.2)
+
+if (JUST_HOME) {
+  plt + facet_grid(delta ~ .)
+} else {
+  plt + facet_grid(delta ~ match.poss)
+}
+
+#ggsave(path(projroot, "graphs", "smd-lines.pdf"), device = "pdf", width = 7.28, height = 4)
+
+```
+
+# Seconds and quarter distribution plots for $\lambda = 2$
+
+```{r, results = "hold", cache = F}
+
+PlotAux <- function(df) {
+  plot.data <- df %>%
+    filter(delta == 4) %>%
+    drop_na(match.id)
+  
+  plt1 <- ggplot(plot.data, aes(seconds, fill = treatment, color = treatment)) +
+    #geom_histogram(binwidth = 30, position = "identity", alpha = 0.2)
+    geom_histogram(aes(y = stat(count / sum(count))), 
+                   binwidth = 10, position = "identity", alpha = 0.2) +
+    #geom_freqpoly(binwidth = 20) + 
+    #geom_bar(alpha = 0.2, position = "identity") + 
+    #stat_count(geom = "step", position = "identity") +
+    #geom_density(alpha = 0.2, adjust = 0.2) +
+    scale_y_continuous(name = "prop", labels = scales::percent)
+  
+  plt2 <- ggplot(plot.data %>% mutate(quarter = if_else(quarter > 4, "OT", as.character(quarter))), aes(quarter, fill = treatment, color = treatment)) +
+    geom_bar(aes(y = stat(count/sum(count))), position = "identity", alpha = 0.2) +
+    scale_y_continuous(name = "prop", labels = scales::percent)
+  
+  cmb <- plot_grid(plt1 + theme(plot.margin = unit(c(6,0,6,0), "pt"),
+                                legend.position = "none"),
+                   plt2 + theme(axis.title.y = element_blank(), 
+                                plot.margin = unit(c(6,0,6,0), "pt"),
+                                legend.position = "none"),
+                   align = 'h') %>%
+    plot_grid(., get_legend(plt1 + theme(legend.position = "bottom", 
+                                         legend.justification = "center")), 
+              ncol = 1, rel_heights = c(1,.2))
+  
+  return(cmb)
+}
+
+AddTitle <- function(p, t) {
+  title <- ggdraw() + draw_label(t)
+  plot_grid(title, p, ncol = 1, rel_heights = c(0.1, 1))
+}
+
+plot(PlotAux(mat.nobal) %>% AddTitle("No Balance"))
+
+plot(PlotAux(mat.maha) %>% AddTitle("Maha"))
+
+plot(PlotAux(mat.propensity.nocalip) %>% AddTitle("Propensity"))
+
+plot(PlotAux(mat.propensity) %>% AddTitle("Propensity With Caliper"))
+
+```
+
+# Plotting covariate distributions
+
+```{r, results = "hold"}
+
+pallet_color <- scale_color_viridis_d("Treatment Group",
+                                      labels = c("Control", "Timeouts"),
+                                      option = "D",
+                                      end = 0.5,
+                                      aesthetics = c("colour", "fill"))
+
+PlotLines <- function(data) {
+  plt.lines <- dlply(data, .(method), function(dtf) {
+    dtf %<>%
+      mutate(treatment = factor(treatment))
+    
+    plt1 <- dtf %>%
+      ggplot(aes(seconds, fill = treatment, color = treatment)) +
+      geom_histogram(aes(y = stat(count / sum(count))), 
+                     binwidth = 10, position = "identity", alpha = 0.15, size = 0.6) +
+      scale_y_continuous(name = "prop", labels = function(x) paste0(x*100,"%")) +
+      scale_x_continuous(name = expression(paste("seconds ", group("(",italic(S[t]),")")))) +
+      pallet_color
+    
+    plt2 <- dtf %>% 
+      mutate(quarter = if_else(quarter > 4, "OT", as.character(quarter))) %>%
+      ggplot(aes(quarter, fill = treatment, color = treatment)) +
+      geom_bar(aes(y = stat(count/sum(count))), 
+               position = "identity", alpha = 0.15, size = 0.6) +
+      scale_y_continuous(name = "prop", labels = function(x) paste0(x*100,"%")) +
+      scale_x_discrete(name = expression(paste("quarter ", group("(",italic(Q[t]),")")))) +
+      pallet_color
+    
+    plt3 <- dtf %>%
+      ggplot(aes(margin, fill = treatment, color = treatment)) +
+      geom_histogram(aes(y = stat(count / sum(count))),
+                     binwidth = 2, position = "identity", alpha = 0.15, size = 0.6) +
+      scale_y_continuous(name = "prop", labels = function(x) paste0(x*100,"%")) +
+      scale_x_continuous(name = expression(paste("scoring margin ", group("(",italic(P[t]),")"))),
+                         breaks = c(-30, 0, 30)) +
+      pallet_color
+    
+    pltlist <- lst(plt1, plt2, plt3) %>%
+      modify(~ .x + theme(legend.position = "none",
+                          axis.title.y = element_blank(),
+                          plot.margin = unit(c(6,0,6,0), "pt")))
+    
+    if(dtf$method[[1]] != "propensity.nocalip") {
+      pltlist %<>%
+        modify(~ .x + theme(axis.title.x = element_blank()))
+    }
+    
+    cmb <- plot_grid(plotlist = pltlist,
+                     align = 'h',
+                     nrow = 1,
+                     rel_widths = c(1.8,1,1))
+    
+    #method.name <- df$method[[1]]
+    plt1 <- dtf %>%
+      ggplot(aes(seconds, fill = treatment, color = treatment)) +
+      geom_histogram(aes(y = stat(count / sum(count))), 
+                     binwidth = 10, position = "identity", alpha = 0.15, size = 1) +
+      pallet_color +
+      theme_cowplot(font_size = 16) +
+      theme(legend.title.align = 0)
+    return(lst(cmb, plt1))
+  })
+}
+
+AddLegend <- function(plts, labels = c("No-balance", "Mahalanobis", "Propensity")) {
+  plotlist <- map(plts, "cmb")
+    
+  plt <- plot_grid(plotlist = plotlist, 
+                   ncol = 1,
+                   labels = labels,
+                   label_x = 0.1,
+                   hjust = 0.4,
+                   label_size = 11) %>%
+    plot_grid(get_legend(plts[[1]]$plt1 + theme(legend.position = "bottom",
+                                                legend.justification = "center")),
+              ncol = 1, 
+              rel_heights = c(1,.08))
+  return(plt)
+}
+
+plot.data <- all.mat %>%
+  filter(method != "propensity")
+
+# plot.data %>%
+#   filter(match.poss == "home", delta == 2) %>%
+#   PlotLines() %>%
+#   AddLegend()
+# SaveGraph("balance-delta2-all.pdf", height = 5)
+
+plot.data %>%
+  filter(match.poss == "home", delta == 4) %>%
+  PlotLines() %>%
+  AddLegend()
+SaveGraph("balance-delta4-all.pdf", height = 6)
+
+# plot.data %>%
+#   filter(match.poss == "home", delta == 6) %>%
+#   PlotLines() %>%
+#   AddLegend()
+# SaveGraph("balance-delta6-all.pdf", height = 5)
+
+```
+
+# Timeout effect distributions and causal effect
+
+```{r, results = "hold"}
+
+theplot1 <- function(df) {
+  ggplot(df, aes(infl.score, color = treatment, fill = treatment)) +
+    geom_density(data = filter(df, delta == 2), adjust = 2.5,  position = "identity", alpha = 0.15, size = 0.6) +
+    geom_density(data = filter(df, delta == 4), adjust = 1.6,  position = "identity", alpha = 0.15, size = 0.6) +
+    geom_density(data = filter(df, delta == 6), adjust = 1,  position = "identity", alpha = 0.15, size = 0.6) +
+    facet_grid(~ delta, scales = "free") + 
+    scale_y_continuous(name = "Density",
+                       #labels = function(x) paste0(x*100,"%"),
+                       breaks = pretty_breaks(4)) +
+    scale_color_viridis_d("Treatment Group",
+                          labels = c("Control", "Timeouts"),
+                          end = 0.5, aesthetics = c("colour", "fill")) +
+    scale_x_continuous(name = expr(Potential~Outcome~group("(",paste(Y^lambda,group("(",A[t]==a,")")),")")),
+                       breaks = pretty_breaks(4))
+}
+
+# plot.data %>%
+#   mutate(infl.score = if_else(match.poss == "away", -infl.score, infl.score)) %>%
+#   ggplot(aes(infl.score, color = treatment, fill = treatment)) +
+#   geom_density(data = filter(plot.data, delta == 2), adjust = 2.5,  position = "identity", alpha = 0.15, size = 0.6) +
+#   geom_density(data = filter(plot.data, delta == 4), adjust = 1.6,  position = "identity", alpha = 0.15, size = 0.6) +
+#   geom_density(data = filter(plot.data, delta == 6), adjust = 1,  position = "identity", alpha = 0.15, size = 0.6) +
+#   facet_wrap(~ delta, scales = "fixed") + 
+#   scale_y_continuous(name = "Density",
+#                      #labels = function(x) paste0(x*100,"%"),
+#                      breaks = pretty_breaks(4)) +
+#   scale_color_viridis_d("Treatment Group",
+#                         labels = c("Control", "Timeouts"),
+#                         end = 0.5, aesthetics = c("colour", "fill")) +
+#   scale_x_continuous(name = expr(Potential~Outcome~group("(",paste(Y^lambda,group("(",A[t]==a,")")),")")),
+#                      breaks = pretty_breaks(4)) +
+#   annotate("text", x = Inf, y = Inf, label = paste0("lambda==", config$deltas), hjust = 1, vjust = 1.5, parse = T)
+
+theplot2 <- function(df) {
+  ggplot(df, aes(infl.score, color = treatment, fill = treatment)) +
+    geom_histogram(aes(y = stat(count / sum(count))),
+                   data = filter(df, delta == 2), binwidth = 0.5,  position = "identity", alpha = 0.15, size = 0.6) +
+    geom_histogram(aes(y = stat(count / sum(count))),
+                   data = filter(df, delta == 4), binwidth = 0.3,  position = "identity", alpha = 0.15, size = 0.6) +
+    geom_histogram(aes(y = stat(count / sum(count))),
+                   data = filter(df, delta == 6), binwidth = 0.1,  position = "identity", alpha = 0.15, size = 0.6) +
+    facet_grid(~ delta, scales = "free") + 
+    scale_y_continuous(name = "Prop", labels = function(x) paste0(x*100,"%")) +
+    scale_color_viridis_d("Treatment Group",
+                          labels = c("Control", "Timeouts"),
+                          end = 0.5, aesthetics = c("colour", "fill"))
+}
+
+theplot3 <- function(df, labels = c("No-balance", "Mahalanobis", "Propensity")) {
+  pltlines <- df %>%
+    dlply(.(method), function(dtf) { 
+      dtf %>%
+        theplot1() +
+        annotate("text", x=Inf, y=Inf, 
+                 label = paste0("lambda==",config$deltas), 
+                 hjust = 1.6, vjust = 1.9, parse = T,
+                 size = 4.5) +
+        facet_wrap(delta ~ ., scales = "fixed") +
+                   #labeller = label_bquote(cols = lambda==.(delta))) +
+        theme(plot.margin = unit(c(6,0,0,0), "pt"),
+              axis.title.y = element_blank(),
+              strip.background = element_blank(),
+              #strip.text = element_text(hjust = 0.8, size = rel(1)),
+              strip.text = element_blank())
+    })
+  
+  plt1 <- pltlines[[1]] + 
+    geom_density(alpha = 0.15, size = 1) +
+    theme_cowplot(font_size = 16) +
+      theme(legend.title.align = 0)
+  
+  pltlines %<>%
+    modify(~ .x %+% theme(plot.margin = unit(c(6,0,0,0), "pt"),
+                          legend.position = "none",
+                          axis.title.x = element_blank()))
+  
+  cmb <- plot_grid(plotlist = pltlines,
+            ncol = 1,
+            #align = "v",
+            labels = labels,
+            label_x = 0.05,
+            label_y = 0.81,
+            hjust = 0,
+            vjust = 0,
+            #hjust = -0.9,
+            #vjust = 2.3,
+            label_size = 11)
+  
+  plot_grid(cmb,
+            NULL,
+            get_legend(plt1 + theme(legend.position = "bottom",
+                                    legend.justification = "center")),
+            ncol = 1, 
+            rel_heights = c(1,.04,.08))
+}
+
+plot.data <- all.mat %>%
+  filter(method != "propensity")
+
+# plot.data %>%
+#     mutate(infl.score = if_else(match.poss == "away", -infl.score, infl.score)) %>%
+#     theplot1() +
+#     facet_wrap(method ~ delta, scales = "fixed", 
+#                labeller = label_bquote(cols = lambda == .(delta)))
+
+plot.data %>%
+    mutate(infl.score = if_else(match.poss == "away", -infl.score, infl.score)) %>%
+    theplot3()
+
+SaveGraph("results-all.pdf", height = 5.5)
+
+
+```
+
+```{r}
+
+
+```
+
+
+```{r}
+
+all.diff <- all.mat %>%
+  mutate(infl.score = if_else(match.poss == "away", -infl.score, infl.score)) %>%
+  dlply(.(method, delta, match.poss), RunInferPermutation, .parallel = T)  %>% 
+  RIPListToDataFrame()
+
+results.table <- all.diff %>%
+  GetPValues(get.ci = F, filter.home = F, separate.effects = T)
+
+results.table
+  
+deltas <- config$deltas
+BrewTableResults <- function(tab.results, suffix.name, themethods = methods) {
+  tab.results %<>% mutate_if(is.numeric, round, digits = 3)
+  themethods
+  
+  brew.tab.results <- "\\begin{tabular}{lccccc} \\toprule
+  Matching & $\\lambda$ & away.obs & away.p-value & home.obs & home.p-value \\\\ \\midrule
+  <% for(m in themethods) { -%>
+  <%= m %>
+  <% for(d in deltas) { -%>
+  <% data <- filter(tab.results, method == m, delta == d) -%>
+  <% away.pv <- pull(data, away.p_value) -%> 
+  <% home.pv <- pull(data, home.p_value) -%>
+  & <%= d %> & <%= format(pull(data, away.obs.diff),nsmall=3) %> & <% if(!is.na(away.pv) && away.pv >= 0.01) { -%> 
+  <%= format(away.pv,nsmall=3) -%> 
+  <% } else { -%> \\signpvalue{<%= format(away.pv,nsmall=3) %>} <% } -%> 
+  & <%= format(pull(data, home.obs.diff),nsmall=3) %> & <% if(!is.na(home.pv) && home.pv >= 0.01) { -%> 
+  <%= format(home.pv,nsmall=3) -%> 
+  <% } else { -%> \\signpvalue{<%= format(home.pv,nsmall=3) %>} <% } %> \\\\
+
+  <% } %>
+  <% } -%>
+  \\bottomrule
+  \\end{tabular}%"
+  
+  brew(text = brew.tab.results, output = path("reports", str_c("latex.table", suffix.name, "txt", sep = ".")))
+}
+
+BrewTableResults(results.table, str_c("results", year, sep = "."))
+
+# all.mat %>%
+#   mutate(infl.score = if_else(match.poss == "away", -infl.score, infl.score)) %>%
+#   dlply(.(method, delta), RunInferPermutation, .parallel = T)  %>% 
+#   RIPListToDataFrame() %>%
+#   GetPValues(get.ci = F, filter.home = F)
+
+```
+
+# Other Results
+## Last 5 minutes
+```{r}
+last5min.methods <- c(str_c(c("nobal", "maha",  "propensity.nocalip"), ".last5min"))
+JoinAllMatchesAndDeltaWithData(methods = last5min.methods,
+                               data = res.timeout.effect.data)
+last5min.data <- env_get_list(global_env(), nms = str_c("mat", last5min.methods, sep = ".")) %>%
+  modify(~ drop_na(., match.id)) %>%
+  set_names(last5min.methods) %>%
+  bind_rows(.id = "method") %>%
+  mutate(method = fct_relevel(method, !!!last5min.methods))
+
+last5min.data %<>%
+  filter(season %in% c(2015, 2016, 2017, 2018)) %>%
+  mutate(infl.score = if_else(match.poss == "away", -infl.score, infl.score))
+
+last5min.results.table <- last5min.data %>%
+  dlply(.(method, delta, match.poss), RunInferPermutation,
+        .parallel = T) %>%
+  RIPListToDataFrame() %>%
+  GetPValues(get.ci = F, filter.home = F, separate.effects = T)
+
+last5min.results.table
+
+BrewTableResults(last5min.results.table, "last5min.results", themethods = last5min.methods)
+```
+
+```{r}
+p_load(knitr)
+p_load(kableExtra)
+
+# all.mat %>%
+#   group_by(method, delta) %>%
+#   summarise(n = n()/2) %>%
+#   arrange(delta) %>%
+#   kable() %>%
+#   kable_styling() %>%
+#   scroll_box(width = "800px", height = "900px") %>%
+#   save_kable(file = "reports/methods.html", self_contained = T)
+
+DT::datatable(all.mat %>%
+  group_by(method, delta, match.poss) %>%
+  summarise(n = n()/2) %>%
+  arrange(delta)) %>%
+  htmlwidgets::saveWidget(path(projroot, "reports/methods.html"), selfcontained = TRUE)
+
+# last5min.data %>%
+#   group_by(method, delta, season) %>%
+#   summarise(n = n()/2) %>%
+#   arrange(delta) %>%
+#   kable() %>%
+#   kable_styling() %>%
+#   scroll_box(width = "800px", height = "900px") %>%
+#   save_kable(file = "reports/last5min.html", self_contained = T)
+
+DT::datatable(last5min.data %>%
+  group_by(method, delta, match.poss) %>%
+  summarise(n = n()/2) %>%
+  arrange(delta)) %>%
+  htmlwidgets::saveWidget(path(projroot, "reports/last5min.html"), selfcontained = TRUE)
+```
+
+```{r}
+
+all.results.table <- last5min.results.table %>%
+  mutate(method = fct_relabel(method, ~ str_remove(.x, fixed(".last5min")))) %>%
+  { bind_rows(last5min = ., all = results.table, .id = "kind") } %>%
+  nest(-kind, -method, -delta, .key = "res") %>%
+  spread(kind, res) %>%
+  unnest(.sep = ".")
+
+BrewTableAllResults <- function(tab.results, suffix.name, themethods = methods) {
+  tab.results %<>% mutate_if(is.numeric, round, digits = 3)
+  deltas <- config$deltas
+  tab.methods <- themethods %>%
+    as_list() %>%
+    set_names(themethods) %>%
+    list_modify(unmatch = "Before Matching", nobal = "No-balance", 
+                maha = "Mahalanobis", propensity.nocalip = "Propensity",
+                propensity = "Propensity with caliper") %>%
+    squash_chr() %>%
+    extract(themethods) %>%
+    rep(length(config$deltas))
+  
+  brew.tab.results <- "\\begin{tabular}{llcccc} \\toprule
+  & & \\multicolumn{2}{c}{All Game} & \\multicolumn{2}{c}{Last 5 Minutes} \\\\
+  \\cmidrule(lr){3-4}
+  \\cmidrule(lr){5-6}
+  $\\lambda$ & Method & \\TEaway & \\TEhome & \\TEaway & \\TEhome \\\\ \\midrule
+  <% for(d in deltas) { -%>
+  <%= d -%>
+  <% for(m_i in 1:length(themethods)) { -%>
+  <% data <- filter(tab.results, method == themethods[[m_i]], delta == d) -%>
+  <% all.away.pv <- pull(data, all.away.p_value) -%>
+  <% all.home.pv <- pull(data, all.home.p_value) -%>
+  <% last.away.pv <- pull(data, last5min.away.p_value) -%>
+  <% last.home.pv <- pull(data, last5min.home.p_value) -%>
+& <%= tab.methods[[m_i]] %> & <%= format(pull(data, all.away.obs.diff),nsmall=3) -%>
+<% if(!is.na(all.away.pv) && all.away.pv < 0.01) { -%>\\signobs <% } -%> 
+& <%= format(pull(data, all.home.obs.diff),nsmall=3) -%>
+<% if(!is.na(all.home.pv) && all.home.pv < 0.01) { -%>\\signobs <% } -%>
+& <%= format(pull(data, last5min.away.obs.diff),nsmall=3) -%>
+<% if(!is.na(last.away.pv) && last.away.pv < 0.01) { -%>\\signobs <% } -%> 
+& <%= format(pull(data, last5min.home.obs.diff),nsmall=3) -%>
+<% if(!is.na(last.home.pv) && last.home.pv < 0.01) { -%>\\signobs <% } %> 
+  \\\\ 
+  <% } -%>
+  <% } -%> 
+  \\bottomrule
+  \\end{tabular}%"
+  
+  #if (SAVE_OUTPUT) brew(text = brew.tab.results, output = path("reports", str_c("latex.table", suffix.name, "txt", sep = ".")))
+  brew(text = brew.tab.results, output = path("reports", str_c("latex.table", suffix.name, "txt", sep = ".")))
+}
+
+BrewTableAllResults(all.results.table, str_c("all.results", year, sep = "."))
+```
+
+
+## By team
+```{r, results = "hold"}
+
+aux.data <- all.mat %>%
+  filter(method == "propensity.nocalip") %>%
+  mutate(method = fct_drop(method)) %>%
+  mutate(infl.score = if_else(match.poss == "away", -infl.score, infl.score)) %>%
+  filter(delta == 4)
+
+tab.results <- aux.data %>%
+  dlply(.(method, delta, match.poss, team), RunInferPermutation, 
+        .parallel = TRUE) %>%
+  RIPListToDataFrame() %>%
+  GetPValues(get.ci = F, filter.home = F, separate.effects = T)
+
+tab.results
+
+```
+
+```{r, include = FALSE}
+# map_dfr(config$deltas %>% set_names(config$deltas), function(d) {
+#   map_dfc(list(nobal = mat.nobal, 
+#                maha = mat.maha, 
+#                mahar = mat.maha.replace, 
+#                prop = mat.propensity), 
+#           function(df) {
+#             df %>%
+#               filter(delta == d, match.poss == "home") %>%
+#               drop_na(match.id) %>%
+#               summarise(eff.treat = weighted.mean(infl.score, A == 1),
+#                         eff.contr = weighted.mean(infl.score, A == 0),
+#                         eff = eff.treat - eff.contr) %>%
+#               pull(eff) %>%
+#               round(4)
+#           })
+# }, .id = "delta")
+
+# map_dfr(set_names(config$deltas, config$deltas), function(d) {
+#   all.mat %>%
+#     filter(delta == d, match.poss == "home") %>%
+#     group_by(method) %>%
+#     summarise(eff.treat = weighted.mean(infl.score, A == 1),
+#               eff.contr = weighted.mean(infl.score, A == 0),
+#               eff = round(eff.treat - eff.contr, 4)) %>%
+#     select(method, eff) %>%
+#     spread(method, eff)
+# }, .id = "delta")
+
+```
+
+```{r, results = "hold"}
+# plot.data <- bind_rows(unmatch = mat.propensity %>% filter(A == 1),
+#                        matched = mat.propensity %>% filter(A == 1, !is.na(match.id)),
+#                        .id = "situation")
+# 
+# ggplot(plot.data, aes(slope.before, fill = situation)) +
+#   facet_grid(delta~.) +
+#   geom_density(position = "identity", alpha = 0.50, adjust = 1.2)
+# #ggsave(path(projroot, "graphs", "unmatch-match.pdf"), device = "pdf", width = 7.28, height = 4)
+
+```
+
+```{r, include = FALSE, results = "hold"}
+# plotCovars <- function(plot.data) {
+#   plt1 <- ggplot(plot.data, aes(slope.before)) +
+#     facet_grid(treatment~delta) +
+#     labs(title = "slope.before") +
+#     geom_bar()
+#   plt2 <-  ggplot(plot.data, aes(seconds)) +
+#     facet_grid(treatment~delta) +
+#     labs(title = "seconds") +
+#     geom_histogram(binwidth = 30)
+#   plt3 <- ggplot(plot.data, aes(quarter)) +
+#     facet_grid(treatment~delta) +
+#     labs(title = "quarter") +
+#     geom_bar()
+#   plt4 <- ggplot(plot.data, aes(margin)) +
+#     facet_grid(treatment~delta) +
+#     labs(title = "margin") +
+#     geom_bar()
+#   list(plt1, plt2, plt3, plt4)
+# }
+# plot.data <- bind_rows(maha = mat.maha, propensity = mat.propensity, .id = "method") %>%
+#   drop_na(match.id)
+# 
+# newPlots <- function(pltdata, var, use_bar = FALSE, bins = 20) {
+#   plt <- ggplot(pltdata, aes_string(x = var, fill = "treatment")) +
+#     facet_grid(method~delta, scales = "free_y")
+#   if (use_bar) {
+#     plt <- plt + geom_bar(position = "identity", alpha = 0.5)
+#   } else {
+#     plt <- plt + geom_histogram(position = "identity", alpha = 0.50, bins = bins) 
+#   }
+#   return(plt)
+# }
+# 
+# newPlots(plot.data, "seconds")
+# ggsave(path(projroot, "graphs", "covar-seconds-balance.pdf"), device = "pdf", width = 7.28, height = 4)
+# 
+# newPlots(plot.data, "quarter", use_bar = T)
+# ggsave(path(projroot, "graphs", "covar-quarter-balance.pdf"), device = "pdf", width = 7.28, height = 4)
+
+# plts <- plotCovars(plot.data %>% filter(method == "maha"))
+# plts[[1]]
+# plts[[2]]
+# plts[[3]]
+# plts[[4]]
+```
+
+
+```{r, include = FALSE}
+# mat.nobal %>%
+#   drop_na(match.id) %>%
+#   group_by(delta, team, poss, A) %>%
+#   summarise_at(vars(infl.score), mean) %>%
+#   group_by(delta, team, poss) %>%
+#   mutate(effect = infl.score - lag(infl.score)) %>%
+#   summarise(effect = last(effect)) %>% ungroup() %>%
+#   mutate(effect = if_else(poss == "away", -effect, effect)) %>%
+#   arrange(delta, poss, desc(effect)) %T>% print(n=2000) %>%
+#   spread(delta, effect, sep= ".")
+# ```
+# ```{r}
+# PerformPermTest <- function(mat.data) {
+#   mat.data %>%
+#     group_by(delta, team, poss) %>%
+#     do(perm.test = oneway_test(infl.score ~ as.factor(A), ., distribution = approximate(B = 10000)))
+# }
+# 
+# PerformPermTest(mat.nobal %>% drop_na(match.id))
+```
