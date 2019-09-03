@@ -1,19 +1,19 @@
-p_load(ProjectTemplate)
+library(ProjectTemplate)
 #load.project(munging = FALSE, cache_loading = FALSE)
 load.project()
 
-p_unload(MASS)
+unloadNamespace("MASS")
 library(MASS, pos = "package:base")
-p_load(rcbalance)
-p_load(optmatch)
-p_load(gbm)
-p_load(doParallel)
+library(rcbalance)
+library(optmatch)
+library(gbm)
+library(doParallel)
 registerDoParallel(cores = detectCores())
 on.exit(stopImplicitCluster())
-p_load(coin)
-p_load(tableone)
-p_load(MatchIt)
-#p_load(Matching)
+library(coin)
+library(tableone)
+library(MatchIt)
+#library(Matching)
 
 RemoveOverlapingPossibleMatches <- function(unmat.data, dist.struct) {
   unmat.data %<>% 
@@ -96,9 +96,6 @@ MahalanobisMatching <- function(data,
     dist.struct <- RemoveOverlapingPossibleMatches(data, dist.struct)
     
     data %<>% as.data.frame()
-    # l1 <- c("seconds")
-    # l2 <- c(l1, "margin")
-    # l3 <- c(l2, "quarter")
     inform("Initiating the matching")
     m.out <- rcbalance(dist.struct,
                        near.exact = if (is.null(near.exact)) NULL else as.character(near.exact),
@@ -122,8 +119,6 @@ GeneratePropesityScores <- function(data, covars = exprs(seconds, quarter, margi
   ps.model <- gbm(formula = new_formula(quote(A), parse_expr(str_flatten(as.character(covars), collapse = " + "))),
                   data = select(gbm.data, -id), 
                   distribution = "bernoulli",
-                  #weights = rep(1, nrow(gbm.data)),
-                  #weights = ave(gbm.data$A, as.factor(gbm.data$A), FUN = function(x) length(x)),
                   n.trees = 2000, 
                   interaction.depth = 2, 
                   n.minobsinnode = 10, 
@@ -233,22 +228,6 @@ MatchSamples_ <- function(data,
   
   mat.data %<>%
     arrange(match.id, A)
-  
-  # matches.treat <- tibble(treatment.id = 1:nrow(filter(data, A==1))) %>%
-  #   left_join(matches.df, by = "treatment.id") %>% 
-  #   select(-control.id)
-  # 
-  # matches.contr <- tibble(control.id = 1:nrow(filter(data, A==0))) %>%
-  #   left_join(matches.df, by = "control.id") %>% 
-  #   select(-treatment.id)
-  # 
-  # mat.data <- bind_rows(filter(m.out$data, A==0) %>%
-  #                        mutate(match.id = matches.contr$match.id),
-  #                      filter(m.out$data, A==1) %>%
-  #                        mutate(match.id = matches.treat$match.id))
-  # mat.data %<>%
-  #   drop_na(match.id) %>%
-  #   arrange(match.id)
   
   res <- lst(m.out = m.out,
              mat.data = mat.data)
@@ -551,31 +530,4 @@ JoinAllMatchesAndDeltaWithData <- function(years = c("2017"),
 env_bind(global_env(), JoinMatchesWithData = JoinMatchesWithData, 
          JoinDeltaMatData = JoinDeltaMatData, 
          JoinAllMatchesAndDeltaWithData = JoinAllMatchesAndDeltaWithData)
-
-# JoinUnmatchesWithData <- function(unmat.data, data,
-#                                   vars.from.treatment = as.character(.(poss, team, opponent))) {
-#   unmat.data %<>%
-#     left_join(data, by = c("delta", "season", "game.id", "poss.id")) %>% 
-#     select(-ends_with(".y")) %>%
-#     rename_at(vars(ends_with(".x")), funs(str_remove(., ".x")))
-#   
-#   if (!is.null(vars.from.treatment)) {
-#     unmat.data %<>%
-#       group_by(match.id) %>%
-#       summarise_at(vars(!!!vars.from.treatment), funs(extract2(., which(A == 1)))) %>%
-#       right_join(mat.data, by = "match.id") %>%
-#       rename_at(vars(ends_with(".x")), funs(str_remove(., ".x"))) %>%
-#       select(-ends_with(".y"))
-#   }
-#   
-#   return(mat.data)
-# }
-
-# AddPsScoreToMatData <- function(mat) {
-#   mat$data %<>% add_column(ps.score = mat$ps.score)
-#   df <- mat$data %>% select(game.id, poss.id, ps.score)
-#   
-#   mat$mat.data %<>% left_join(df, by = c("game.id", "poss.id"))
-#   return(mat)
-# }
 

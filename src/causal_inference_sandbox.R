@@ -1,4 +1,4 @@
-p_load(ProjectTemplate)
+library(ProjectTemplate)
 invisible(rlang::locally(source("src/causal_inference.R", local = T)))
 
 methods <- c("nobal", "maha", "maha.replace", "maha.noquarter", "propensity", 
@@ -60,7 +60,7 @@ plot.data %>%
 
 
 ################
-p_load(twang)
+library(twang)
 data <- res.propensity.2017 %>%
     filter(delta == 4, match.poss == "home")
 ps.lalonde <- ps(A ~ seconds + quarter + margin,
@@ -100,7 +100,7 @@ ps.data <- ps(A ~ seconds + quarter + margin,
               verbose=TRUE)
 plot(ps.data, plots=3)
 
-p_load(survey)
+library(survey)
 
 data$w <- get.weights(ps.data, stop.method="es.mean")
 
@@ -259,7 +259,7 @@ plts$.out %>% walk2(plts$method, ~ plot(.x + labs(title = .y)))
 #   filter(match.poss == "home", delta == 2) %>%
 #   drop_na(match.id)
 
-p_load(coin)
+library(coin)
 
 test.data <- all.mat.2017 %>%
   filter(match.poss == "home", delta == 4)
@@ -309,7 +309,7 @@ res.maha.replace.delta6.2017$mat.data %>%
   do(unique.strat = unique(.$strat)) %>%
   unnest(unique.strat)
 
-# p_load(SVMMatch)
+# library(SVMMatch)
 # data <- res.propensity.2017 %>%
 #   filter(delta == 4, match.poss == "home") %>%
 #   drop_na(match.id)
@@ -320,7 +320,7 @@ res.maha.replace.delta6.2017$mat.data %>%
 #                         as.matrix(),
 #                       dv = data$infl.score)
 
-#p_load(CausalGAM)
+#library(CausalGAM)
 
 data <- res.maha.2017 %>% filter(delta == 4) %>% filter(match.poss == "home")
 #dist.struct <- build.dist.struct(data$A, as.data.frame(select(data, quarter, seconds, margin)), data$strat, calip.option = "none")
@@ -340,8 +340,8 @@ mat.propensity.delta2.2017$data %>%
   #geom_smooth(method = "loess", se = F) +
   geom_point(alpha = 0.2, size = 1.3)
 
-p_load(foreach)
-p_load(iterators)
+library(foreach)
+library(iterators)
 foreach(df = iter(ll(mat.propensity.delta2.2017$data, mat.propensity.delta2.2017$mat.data)), .verbose = T)
 
 foreach(df = iter(ll(mat.propensity.delta2.2017$data, mat.propensity.delta2.2017$mat.data)), .verbose = T) %do% {

@@ -1,3 +1,6 @@
+
+### Functions
+
 ReadPbpRawData <- function(folder.path) {
   pbp.data.list <- list.files(folder.path, full.names = T) %>%
     llply(function(x) {
@@ -58,11 +61,12 @@ CleanAndGenerateGamePbp <- function(game) {
            quarter = cumsum(as.integer(endofquarter)) + 1,
            quarter = if_else(endofquarter, quarter - 1, quarter),
            quarter = as.integer(quarter)) %>%
-    #filter(!endofquarter) %>%
     select(-endofquarter)
   
   return(game)
 }
+
+### Script
 
 games.list <- config$seasons %>% 
   map(function(season) {
@@ -81,22 +85,6 @@ games.list <- config$seasons %>%
   }) %>%
   flatten()
 
-# if (!exists('games.list')) {
-#   games.list <- map(config$seasons, function(season) {
-#     pbp.data.list <- ReadPbpRawData(file.path(config$pbp_folder, season))
-#     GenerateGamesPbpFromRawData(pbp.data.list)
-#   })
-#   # if(length(config$seasons) > 1) {
-#   #   games.list %<>% set_names(config$seasons)
-#   # } else {
-#   #   games.list %<>% flatten()
-#   # }
-#   games.list %>% 
-#     imap(~ set_names(.x, str_c(rep(.y, length(.x)), names(.x), sep="."))) %>% 
-#     flatten()
-#   cache('games.list', games.list)
-# }
-
 games.teams <- config$seasons %>%
   map_dfr(function(season) {
     name.cache <- str_c("games.teams", season, sep=".")
@@ -113,15 +101,6 @@ games.teams <- config$seasons %>%
     
     env_get(global_env(), name.cache)
   })
-# cache('games.teams', {
-#   config$seasons %>%
-#     set_names(config$seasons) %>%
-#     map_dfr(function(season) {
-#       ReadPbpRawData(file.path(config$pbp_folder, season)) %>%
-#         map_dfr(~ tibble(away = names(.)[2], home = names(.)[6]), .id = "game.id")
-#     }, .id = "season") %>%
-#     mutate_at(vars(season), as.integer)
-# }, c('games.list'))
 
 rm(ReadPbpRawData, GenerateGamesPbpFromRawData, CleanAndGenerateGamePbp)
 

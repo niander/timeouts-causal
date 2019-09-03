@@ -1,12 +1,12 @@
-p_load(ProjectTemplate)
+library(ProjectTemplate)
 load.project(cache_loading = FALSE, munging = FALSE)
 
-#p_load(XML)
-#p_load(RCurl)
+#library(XML)
+#library(RCurl)
 #xmldata <- getURL(url)
 #oldtable <- readHTMLTable(xmldata, as.data.frame = TRUE)[[1]]
 
-p_load(rvest)
+library(rvest)
 CrawlPbpTable <- function(url) {
   table <- url %>% read_html() %>%
     html_node("#pbp") %>%
@@ -52,7 +52,7 @@ for(month in tolower(c(month.name[10:12], month.name[1:6]))) {
   pbpurls = c(pbpurls, paste0("https://www.basketball-reference.com/boxscores/pbp/", gamecodes, ".html"))
 }
 
-p_load(doParallel)
+library(doParallel)
 #cl <- makeForkCluster(detectCores())
 #registerDoParallel(cl)
 registerDoParallel(cores=detectCores())

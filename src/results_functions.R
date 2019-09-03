@@ -37,7 +37,7 @@ PrintTableOnesUnify <- function(df, xvars = .(slope.before, quarter, seconds, ma
   return(invisible(tabones))
 }
 
-p_load(cowplot)
+library(cowplot)
 
 PlotLines <- function(data) {
   plt.lines <- dlply(data, .(method), function(dtf) {

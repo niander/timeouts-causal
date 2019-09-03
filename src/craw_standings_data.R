@@ -1,4 +1,4 @@
-p_load(ProjectTemplate)
+library(ProjectTemplate)
 load.project()
 
 CrawlStandingsTable <- function(url = "http://www.basketball-reference.com/leagues/NBA_2015_standings.html") {

@@ -1,3 +1,6 @@
+
+### Functions
+
 only_valids <- . %>% filter(valid.infl.score) %>% 
   select(-valid.infl.score) %>%
   drop_na(infl.score)
@@ -9,6 +12,8 @@ timeouts_only <- . %>%
 others_only <- . %>%
   filter(not(kind %in% c("timeout", "official.timeout", "endquarter"))) %>%
   only_valids()
+
+### Script
 
 contr.inflscore <- config$seasons %>%
   map_dfr(function(season) {

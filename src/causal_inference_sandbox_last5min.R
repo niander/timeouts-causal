@@ -1,4 +1,4 @@
-p_load(ProjectTemplate)
+library(ProjectTemplate)
 invisible(rlang::locally(source("src/causal_inference.R", local = T)))
 
 methods <- c(str_c(c("nobal", "maha", "propensity", "propensity.nocalip"), ".last5min"))

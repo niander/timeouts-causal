@@ -1,8 +1,8 @@
 projroot <- rprojroot::find_root(rprojroot::is_rstudio_project)
 
-p_load(fs)
-p_load(purrr)
-p_load(readr)
+library(fs)
+library(purrr)
+library(readr)
 
 tables.path <- path(projroot, "data", "pbp")
 seasons.path <- dir_ls(tables.path, regexp = "\\-old", invert = TRUE)

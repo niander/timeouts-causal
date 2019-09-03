@@ -43,11 +43,6 @@ timeout.effect.data <- config$seasons %>%
         mutate(seconds = as.integer(seconds(time)),
                seconds = if_else(quarter <= 4, 12L*60L - seconds, 5L*60L - seconds))
       
-      # invert margin score for timeout-guest
-      #if (invert.guest.timeout) {
-      #  tef.all <- tef.all %>% AggregateHomeAndGuest(margin.score)
-      #}
-      
       tefdata %<>%
         select(-away, -home, -kind, -time, -timeout.poss) %>%
         mutate(poss = if_else(treatment == "timeout", poss, na_chr))

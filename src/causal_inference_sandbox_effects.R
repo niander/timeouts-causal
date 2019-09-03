@@ -1,4 +1,4 @@
-p_load(ProjectTemplate)
+library(ProjectTemplate)
 invisible(rlang::locally(source("src/causal_inference.R", local = T)))
 source("src/results_functions.R")
 
