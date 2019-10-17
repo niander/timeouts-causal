@@ -5,5 +5,6 @@ add.config(
   seasons = c(2017),
   deltas = c(2, 4, 6),
   results_folder = "data/res",
-  clean_global_vars = FALSE
+  clean_global_vars = TRUE,
+  matching_seed = 222
 )

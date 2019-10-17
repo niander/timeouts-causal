@@ -68,7 +68,6 @@ games.df <- config$seasons %>%
           count <- 0
           sbs <- with(game, which(not(kind %in% exprs(timeout, official.timeout, endquarter))))
           while(anyNA(game$poss[sbs]) && count < length(sbs)) {
-            #game %<>% mutate(poss = if_else(is.na(poss), lag(poss), poss))
             game[sbs,] <- game[sbs,] %>% mutate(poss = if_else(is.na(poss), lag(poss), poss))
             count <- count + 1
           }

@@ -52,33 +52,3 @@ LoadObjectList <- function(folder, name, df = F, col.name = NULL, ...) {
   else
     return(obj)
 }
-
-cat_clipboard <- function(x, sep=" ", fill=FALSE, labels=NULL, append=FALSE) {
-  
-  if(Sys.info()["sysname"]=="Linux") {
-    if(system("which xclip", intern=TRUE)==""){
-      stop("
-  xclip is required when using Linux. Please install it.
-  Under Debian / Ubuntu Linux, type the following command at shell prompt:
-  sudo apt-get install xclip
-  Under Red Hat / CentOS / RHEL / Fedora Linux please make sure third party repos are activated and type the following command at shell prompt:
-  yum install xclip
-      ")
-    } else {
-      clipboard <- pipe("xclip -selection clipboard -i", open="w")
-      cat(x, file=clipboard, sep=sep, fill=fill, labels=labels, append=append)
-      close(clipboard)
-    }
-  }
-  
-  if(Sys.info()["sysname"]=="Darwin") {
-    clipboard <- pipe("pbcopy", open="w") 
-    cat(x, file=clipboard, sep=sep, fill=fill, labels=labels, append=append)
-    close(clipboard)
-  }
-  
-  if(Sys.info()["sysname"]=="Windows") {
-    cat(x, file="clipboard", sep=sep, fill=fill, labels=labels, append=append)
-  }
-  
-}

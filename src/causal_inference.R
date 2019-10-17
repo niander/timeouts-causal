@@ -15,6 +15,8 @@ library(tableone)
 library(MatchIt)
 #library(Matching)
 
+### Functions
+
 RemoveOverlapingPossibleMatches <- function(unmat.data, dist.struct) {
   unmat.data %<>% 
     group_by(A) %>%
@@ -185,7 +187,7 @@ MatchSamples_ <- function(data,
   inform("Ready to start the matching")
   
   old.random.state <- .Random.seed
-  set.seed(222)
+  set.seed(config$matching_seed)
   
   ps.scores <- na_dbl
   m.out <- switch(method,
@@ -299,63 +301,7 @@ PrepareData <- function(data) {
   return(data)
 }
 
-#LoadObjects(config$results_folder, env_to_save = global_env())
-
-###########################
-
-# data <- PrepareData(res.timeout.effect.data) %>%
-#   filter(season == 2017)
-# 
-# controls <- data %>%
-#   filter(A == 1) %>%
-#   group_by(poss) %>%
-#   by_slice(~ semi_join(x = filter(data, A==0) %>% select(-poss), 
-#                        ., by = "strat"), .collate = "rows")
-# 
-# new.data <- bind_rows(filter(data, A == 1), controls) %>%
-#   arrange(A, delta, season, game.id, poss.id)
-# 
-# 
-# res.away <- new.data %>% filter(A == 0 | (A == 1 & poss == "away"))
-# res.home <- new.data %>% filter(A == 0 | (A == 1 & poss == "home"))
-# 
-# data <- res.home
-# 
-# data %<>% mutate(id = row_number())
-# 
-# no.control.id <- data %>%
-#   filter(A == 1) %>%
-#   anti_join(filter(data, A == 0), by = "strat") %>%
-#   pull(id)
-# 
-# data %<>%
-#   mutate(has.control = not(id %in% no.control.id)) %>%
-#   select(-id)
-# 
-# unmat.data <- data %>%
-#   filter(has.control) %>%
-#   arrange(A, delta, game.id, poss.id) %>%
-#   mutate(strat.id = group_indices(., strat))
-# 
-# covars = exprs(seconds, quarter, margin)
-# dist.struct <- build.dist.struct(z = unmat.data$A,
-#                                  X = select(unmat.data, !!!covars) %>% as.data.frame(),
-#                                  exact = unmat.data$strat.id,
-#                                  calip.option = "none",
-#                                  verbose = TRUE)
-# 
-# res <- new.data %>% 
-#   group_by(poss) %>%
-#   by_slice(function(df, ...) MatchSamples_(df, covars, method, ps.config, ...), ..., .collate = "list") %$%
-#   set_names(.out, poss) %>%
-#   transpose()
-# 
-# res$mat.data %<>% bind_rows(.id = "poss") %>%
-#   select(-poss, everything()) %>%
-#   rename(match.poss = poss)
-# 
-
-############################
+### Script
 
 RunAllMatches <- function(data) {
   data.name <- as_name(ensym(data))
