@@ -110,6 +110,7 @@ AddLegend <- function(plts, labels = c("No-balance", "Mahalanobis", "Propensity"
   return(plt)
 }
 
+# Remeber to drop any NA on match.id
 RunInferPermutation <- function(data) {
   data.sp <- data %>%
     mutate_at(vars(treatment), factor) %>%

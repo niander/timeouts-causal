@@ -406,7 +406,7 @@ ggplot(plt.data, aes(x = slope.before, y = n, group = factor(delta), colour = fa
 
 #Treatment group covariate comparison
 
-JoinDeltaMatData(c("2017"), c("nobal", "maha", "propensity"))
+JoinAllMatchesAndDeltaWithData(c("2017"), c("nobal", "maha", "propensity"))
 mat.nobal.2017 <- JoinMatchesWithData(res.nobal.2017, res.timeout.effect.data)
 mat.maha.2017 <- JoinMatchesWithData(res.maha.2017, res.timeout.effect.data)
 mat.propensity.2017 <- JoinMatchesWithData(res.propensity.2017, res.timeout.effect.data)

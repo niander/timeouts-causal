@@ -1,6 +1,6 @@
 library(ProjectTemplate)
-#load.project(munging = FALSE, cache_loading = FALSE)
-load.project()
+load.project(munging = FALSE, cache_loading = FALSE)
+#load.project()
 
 unloadNamespace("MASS")
 library(MASS, pos = "package:base")
@@ -427,8 +427,8 @@ JoinMatchesWithData <- function(mat.data, data,
   return(mat.data)
 }
 
-JoinDeltaMatData <- function(years = c("2017"),
-                             methods = c("nobal", "propensity"),
+JoinMatDataFromDeltasAndMethods <- function(years = config$seasons,
+                             methods = c("nobal", "propensity.nocalip"),
                              deltas = config$deltas) {
   
   crossing(methods, years) %$%
@@ -456,11 +456,11 @@ JoinDeltaMatData <- function(years = c("2017"),
     })
 }
 
-JoinAllMatchesAndDeltaWithData <- function(years = c("2017"), 
-                                           methods = c("nobal", "propensity"),
+JoinAllMatchesAndDeltaWithData <- function(years = config$seasons, 
+                                           methods = c("nobal", "propensity.nocalip"),
                                            deltas = config$deltas,
                                            data, ...) {
-  JoinDeltaMatData(years, methods, deltas)
+  JoinMatDataFromDeltasAndMethods(years, methods, deltas)
   
   walk(methods, function(m) {
     nm <- str_c("res", m, sep = ".")
@@ -474,6 +474,26 @@ JoinAllMatchesAndDeltaWithData <- function(years = c("2017"),
 }
 
 env_bind(global_env(), JoinMatchesWithData = JoinMatchesWithData, 
-         JoinDeltaMatData = JoinDeltaMatData, 
+         JoinMatDataFromDeltasAndMethods = JoinMatDataFromDeltasAndMethods, 
          JoinAllMatchesAndDeltaWithData = JoinAllMatchesAndDeltaWithData)
 
+library(sensitivitymult)
+
+JoinMatDataFromDeltasAndMethods()
+
+mat.propensity.nocalip %>% filter(delta == 4, season == 2017, match.poss == "home") %$%
+  senmCI(infl.score, A, match.id, trim = Inf, gamma = 10, twosided = T, TonT = T, alpha = 0.01)
+  #senm(infl.score, A, match.id, trim = Inf, gamma = 1, alternative = "less", TonT = T, )
+
+mat.propensity.nocalip %>% filter(delta == 6, season == 2017, match.poss == "home") %>%
+  drop_na(match.id) %>%
+  RunInferPermutation()# %>%
+  #RIPListToDataFrame()
+
+tdata <- mat.propensity.nocalip %>% filter(delta == 6, season == 2017, match.poss == "home") %>%
+  mutate_at(vars(A), factor) %>%
+  specify(infl.score ~ A)
+
+tdata %>% calculate(stat = "diff in means", order = c("1", "0"))
+
+tdata %>% group_by(A) %>% summarise(mean = mean(infl.score))
