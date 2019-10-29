@@ -2,7 +2,7 @@ library(ProjectTemplate)
 load.project(munging = FALSE, cache_loading = FALSE)
 #load.project()
 
-unloadNamespace("MASS")
+#unloadNamespace("MASS")
 library(MASS, pos = "package:base")
 library(rcbalance)
 library(optmatch)
@@ -322,17 +322,17 @@ RunAllMatches <- function(data) {
   #              cache.suffix.name = "noquarter")
 }
 
-data.2017 <- PrepareData(res.timeout.effect.data) %>%
-  filter(season == 2017)
-
-delta2.2017 <- data.2017 %>% filter(delta == 2)
-RunAllMatches(delta2.2017)
-
-delta4.2017 <- data.2017 %>% filter(delta == 4)
-RunAllMatches(delta4.2017)
-
-delta6.2017 <- data.2017 %>% filter(delta == 6)
-RunAllMatches(delta6.2017)
+# data.2017 <- PrepareData(res.timeout.effect.data) %>%
+#   filter(season == 2017)
+# 
+# delta2.2017 <- data.2017 %>% filter(delta == 2)
+# RunAllMatches(delta2.2017)
+# 
+# delta4.2017 <- data.2017 %>% filter(delta == 4)
+# RunAllMatches(delta4.2017)
+# 
+# delta6.2017 <- data.2017 %>% filter(delta == 6)
+# RunAllMatches(delta6.2017)
 
 #####
 
@@ -477,23 +477,23 @@ env_bind(global_env(), JoinMatchesWithData = JoinMatchesWithData,
          JoinMatDataFromDeltasAndMethods = JoinMatDataFromDeltasAndMethods, 
          JoinAllMatchesAndDeltaWithData = JoinAllMatchesAndDeltaWithData)
 
-library(sensitivitymult)
-
-JoinMatDataFromDeltasAndMethods()
-
-mat.propensity.nocalip %>% filter(delta == 4, season == 2017, match.poss == "home") %$%
-  senmCI(infl.score, A, match.id, trim = Inf, gamma = 10, twosided = T, TonT = T, alpha = 0.01)
-  #senm(infl.score, A, match.id, trim = Inf, gamma = 1, alternative = "less", TonT = T, )
-
-mat.propensity.nocalip %>% filter(delta == 6, season == 2017, match.poss == "home") %>%
-  drop_na(match.id) %>%
-  RunInferPermutation()# %>%
-  #RIPListToDataFrame()
-
-tdata <- mat.propensity.nocalip %>% filter(delta == 6, season == 2017, match.poss == "home") %>%
-  mutate_at(vars(A), factor) %>%
-  specify(infl.score ~ A)
-
-tdata %>% calculate(stat = "diff in means", order = c("1", "0"))
-
-tdata %>% group_by(A) %>% summarise(mean = mean(infl.score))
+# library(sensitivitymult)
+# 
+# JoinMatDataFromDeltasAndMethods()
+# 
+# mat.propensity.nocalip %>% filter(delta == 4, season == 2017, match.poss == "home") %$%
+#   senmCI(infl.score, A, match.id, trim = Inf, gamma = 10, twosided = T, TonT = T, alpha = 0.01)
+#   #senm(infl.score, A, match.id, trim = Inf, gamma = 1, alternative = "less", TonT = T, )
+# 
+# mat.propensity.nocalip %>% filter(delta == 6, season == 2017, match.poss == "home") %>%
+#   drop_na(match.id) %>%
+#   RunInferPermutation()# %>%
+#   #RIPListToDataFrame()
+# 
+# tdata <- mat.propensity.nocalip %>% filter(delta == 6, season == 2017, match.poss == "home") %>%
+#   mutate_at(vars(A), factor) %>%
+#   specify(infl.score ~ A)
+# 
+# tdata %>% calculate(stat = "diff in means", order = c("1", "0"))
+# 
+# tdata %>% group_by(A) %>% summarise(mean = mean(infl.score))

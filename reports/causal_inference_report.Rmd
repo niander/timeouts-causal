@@ -52,7 +52,7 @@ theme_set(theme_cowplot(font_size = 12) +
 JUST_HOME = TRUE
 SAVE_OUTPUT = TRUE
 
-methods =  c("nobal", "maha", "propensity.nocalip", "propensity")
+methods =  c("nobal", "maha", "propensity.nocalip")#, "propensity")
 year <- c("2017")
 JoinAllMatchesAndDeltaWithData(year, methods, data = res.timeout.effect.data)
 
@@ -530,10 +530,20 @@ SaveGraph("results-all.pdf", height = 5.5)
 
 ```{r}
 
-all.diff <- all.mat %>%
-  mutate(infl.score = if_else(match.poss == "away", -infl.score, infl.score)) %>%
-  dlply(.(method, delta, match.poss), RunInferPermutation, .parallel = T)  %>% 
-  RIPListToDataFrame()
+library(doParallel)
+registerDoParallel(core = 2)
+on.exit(stopImplicitCluster())
+
+all.diff
+final.all.diff <- ldply(config$deltas, .fun = function(d) {
+    all.diff <- all.mat %>%
+      filter(delta == d) %>%
+      mutate(infl.score = if_else(match.poss == "away", -infl.score, infl.score)) %>%
+      dlply(.(method, delta, match.poss), RunInferPermutation, .parallel = T)  %>% 
+      RIPListToDataFrame()
+    inform(paste0("Done delta = ", d))
+    return(all.diff)
+  })
 
 results.table <- all.diff %>%
   GetPValues(get.ci = F, filter.home = F, separate.effects = T)

@@ -122,7 +122,7 @@ RunInferPermutation <- function(data) {
   
   nulldist.diff <- data.sp %>%
     hypothesize(null = "independence") %>%
-    generate(reps = 1000, type = "permute") %>%
+    generate(reps = 10000, type = "permute") %>%
     calculate(stat = "diff in means", order = c("timeout", "control"))
   
   .Random.seed <- old.random.state
