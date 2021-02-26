@@ -37,7 +37,8 @@ knitr::knit_hooks$set(output = function(x, options) {
 ```
 
 ```{r source, echo = FALSE, include = FALSE}
-source("src/causal_inference.R")
+library(ProjectTemplate)
+load.project(munging = FALSE, cache_loading = FALSE)
 source("src/results_functions.R")
 # library(gridExtra)
 # library(gtable)
@@ -50,7 +51,7 @@ theme_set(theme_cowplot(font_size = 12) +
 #            theme(legend.position = "bottom", legend.justification = "center"))
 
 JUST_HOME = TRUE
-SAVE_OUTPUT = TRUE
+SAVE_OUTPUT = FALSE
 
 methods =  c("nobal", "maha", "propensity.nocalip")#, "propensity")
 year <- c("2017")
@@ -63,7 +64,9 @@ all.mat <- env_get_list(global_env(), nms = str_c("mat", methods, sep = ".")) %>
   bind_rows(.id = "method") %>%
   mutate(method = fct_relevel(method, !!!methods))
 
-PrintTableOnes <- function(df, xvars = .(slope.before, quarter, seconds, margin), print.it = F) {
+library(tableone)
+
+PrintTableOnes <- function(df, xvars = .(slope.before, seconds, quarter, margin), print.it = F) {
   tabones <- list()
   i <- 1
   for(dta in config$deltas) {
@@ -86,7 +89,7 @@ PrintTableOnes <- function(df, xvars = .(slope.before, quarter, seconds, margin)
   return(invisible(tabones))
 }
 
-PrintTableOnesUnify <- function(df, xvars = .(slope.before, quarter, seconds, margin), print.it = F) {
+PrintTableOnesUnify <- function(df, xvars = .(slope.before, seconds, quarter, margin), print.it = F) {
   df %<>%
     mutate_at(vars(slope.before, slope.after, infl.score), funs(if_else(match.poss == "away", -1 * ., .)))
   tabones <- list()
@@ -100,6 +103,7 @@ PrintTableOnesUnify <- function(df, xvars = .(slope.before, quarter, seconds, ma
     tabones[[i]] <- l
     i <- i + 1
   }
+  tabones %<>% set_names(config$deltas)
   if (print.it) print(str_glue("==========================="))
   return(invisible(tabones))
 }
@@ -114,8 +118,8 @@ BrewTableOne <- function(tab.ones, suffix.name) {
   $\\lambda$ = <%= deltas[[i]] %> & control & timeout & SMD \\\\ \\midrule
   n & <%= tab[1,1] %> & <%= tab[1,2] %> & ---\\\\
   \\stmcB (mean (sd)) & <%= tab[2,1] %> & <%= tab[2,2] %> & <%= tab[2,3] %> \\\\
-  quarter (mean (sd)) & <%= tab[3,1] %> & <%= tab[3,2] %> & <%= tab[3,3] %> \\\\
-  seconds (mean (sd)) & <%= tab[4,1] %> & <%= tab[4,2] %> & <%= tab[4,3] %> \\\\
+  seconds (mean (sd)) & <%= tab[3,1] %> & <%= tab[3,2] %> & <%= tab[3,3] %> \\\\
+  quarter (mean (sd)) & <%= tab[4,1] %> & <%= tab[4,2] %> & <%= tab[4,3] %> \\\\
   $P_i$ (mean (sd)) & <%= tab[5,1] %> & <%= tab[5,2] %> & <%= tab[5,3] %> \\\\ <% if(i < length(tab.ones)) { -%> 
   \\midrule
   <% } %>
@@ -197,13 +201,12 @@ BrewBigTableOne <- function(tab.ones, suffix.name) {
     extract(methods) %>%
     rep(length(config$deltas))
   
-  if(SAVE_OUTPUT) brew(file=str_c(rprojroot::find_root(rprojroot::is_rstudio_project), "/lib/", "tab.ones.brew"), 
-                       output = str_c("latex.table", suffix.name, "txt", sep = "."))
+  brew(file=path(rprojroot::find_root(rprojroot::is_rstudio_project), "reports", "tab.one.subtable.brew"),
+     output =  path("reports", str_c("latex.table", suffix.name, "txt", sep = ".")))
 }
 
-all.tab.ones <- all.mat %>%
-  mutate_at(vars(method), as.character) %>%
-  bind_rows(mat.nobal %>% mutate(method = "unmatch")) %>%
+
+get_all_tab_ones <- . %>%
   mutate(method = fct_relevel(method, c("unmatch", methods))) %>%
   dlply(.(method), function(df) {
     PrintTableOnesUnify(df, print.it = F)
@@ -211,7 +214,67 @@ all.tab.ones <- all.mat %>%
   transpose() %>%
   flatten()
 
+all.tab.ones <- all.mat %>%
+  bind_rows(mat.nobal %>% mutate(method = as_factor("unmatch"))) %>%
+  get_all_tab_ones()
+
 BrewBigTableOne(all.tab.ones, str_c("all.methods", year, sep = "."))
+
+```
+
+```{r}
+
+add_seconds <- . %>%
+  add_column(seconds = na_int, .after = 'time') %>%
+  mutate(seconds = as.integer(seconds(time)),
+         seconds = if_else(quarter <= 4, 12L*60L - seconds, 5L*60L - seconds))
+
+get_controls <- . %>%
+  filter(!is.na(infl.score), valid.infl.score) %>%
+  filter(!kind %in% c("timeout", "official.timeout", "endquarter")) %>%
+  select(-time, -pts, -valid.infl.score)
+
+controls.unmatched <- games.inflscore %>% 
+  add_seconds() %>%
+  get_controls() %>%
+  mutate(A = 0, treatment = "control")
+
+create_unmatched_by_poss <- function(data, myposs) {
+  data.t <- filter(data, A == 1, poss == myposs)
+  
+  #data.c <- filter(data, A == 0) %>%
+  #  filter(strat %in% pull(data.t, strat))
+  
+  data.c <- filter(data, A == 0)
+  
+  bind_rows(data.t, data.c) %>%
+    mutate(match.id = NA, match.poss = myposs)
+}
+
+mat.unmatch <- mat.nobal %>%
+  filter(A == 1) %>%
+  bind_rows(controls.unmatched) %>%
+  mutate(method = "unmatch")
+
+mat.unmatch.home <- mat.unmatch %>% create_unmatched_by_poss("home")
+mat.unmatch.away <- mat.unmatch %>% create_unmatched_by_poss("away")
+
+# home
+all.tab.ones.home <- all.mat %>%
+  filter(match.poss == "home") %>%
+  bind_rows(mat.unmatch.home) %>%
+  get_all_tab_ones()
+
+BrewBigTableOne(all.tab.ones.home, str_c("all.methods", year, "home", sep = "."))
+
+# away
+all.tab.ones.home <- all.mat %>%
+  filter(match.poss == "away") %>%
+  bind_rows(mat.unmatch.away) %>%
+  get_all_tab_ones()
+
+BrewBigTableOne(all.tab.ones.home, str_c("all.methods", year, "away", sep = "."))
+
 
 ```
 
@@ -407,7 +470,6 @@ SaveGraph("balance-delta4-all.pdf", height = 6)
 # Timeout effect distributions and causal effect
 
 ```{r, results = "hold"}
-
 theplot1 <- function(df) {
   ggplot(df, aes(infl.score, color = treatment, fill = treatment)) +
     geom_density(data = filter(df, delta == 2), adjust = 2.5,  position = "identity", alpha = 0.15, size = 0.6) +
@@ -519,18 +581,10 @@ plot.data %>%
 
 SaveGraph("results-all.pdf", height = 5.5)
 
-
-```
-
-```{r}
-
-
 ```
 
 
 ```{r}
-
-
 all.diff <- ldply(config$deltas, .fun = function(d) {
     all.diff.delta <- all.mat %>%
       filter(delta == d) %>%
@@ -603,16 +657,66 @@ last5min.data %<>%
   filter(season %in% c(2015, 2016, 2017, 2018)) %>%
   mutate(infl.score = if_else(match.poss == "away", -infl.score, infl.score))
 
-last5min.results.table <- last5min.data %>%
-  dlply(.(method, delta, match.poss), RunInferPermutation,
-        .parallel = T) %>%
-  RIPListToDataFrame() %>%
+last5min.permuts <- last5min.data %>%
+  dlply(.(method, delta, match.poss), RunInferPermutation, .progress = "text") %>%
+        #.parallel = T) %>%
+  RIPListToDataFrame()
+
+SaveObject(last5min.permuts, folder = path("reports", "data"), name = "last5min.permutations.10m")  
+
+last5min.results.table <- last5min.permuts %>%
   GetPValues(get.ci = F, filter.home = F, separate.effects = T)
 
 last5min.results.table
 
-BrewTableResults(last5min.results.table, "last5min.results", themethods = last5min.methods)
+BrewTableResults(last5min.results.table, "last5min.results.10m", themethods = last5min.methods)
 ```
+
+
+## All but last 5 minutes
+```{r}
+but5min.methods <- c(str_c(c("nobal", "maha",  "propensity.nocalip"), ".but5min"))
+JoinAllMatchesAndDeltaWithData(years = c("2017"),
+                               methods = but5min.methods,
+                               data = res.timeout.effect.data)
+but5min.data <- env_get_list(global_env(), nms = str_c("mat", but5min.methods, sep = ".")) %>%
+  modify(~ drop_na(., match.id)) %>%
+  set_names(but5min.methods) %>%
+  bind_rows(.id = "method") %>%
+  mutate(method = fct_relevel(method, !!!but5min.methods))
+
+but5min.data %<>%
+  filter(season == 2017) %>%
+  mutate(infl.score = if_else(match.poss == "away", -infl.score, infl.score))
+
+but5min.permuts <- ldply(config$deltas, .fun = function(d) {
+    inform(str_c("Start delta = ", d))
+    perm.delta <- but5min.data %>%
+      filter(delta == d) %>%
+      dlply(.(method, delta, match.poss), RunInferPermutation, .progress = "text")  %>% 
+      RIPListToDataFrame()
+    inform(str_c("Done delta = ", d))
+    return(perm.delta)
+  }) %>%
+  as_tibble()
+
+# but5min.permuts <- but5min.data %>%
+#   dlply(.(method, delta, match.poss), RunInferPermutation, .progress = "text") %>%
+#         #.parallel = T) %>%
+#   RIPListToDataFrame()
+
+SaveObject(but5min.permuts, folder = path("reports", "data"), name = "but5min.permutations.10m")  
+
+but5min.results.table <- but5min.permuts %>%
+  GetPValues(get.ci = F, filter.home = F, separate.effects = T)
+
+but5min.results.table
+
+BrewTableResults(but5min.results.table, "but5min.results.10m", themethods = but5min.methods)
+```
+
+
+
 
 ```{r}
 library(knitr)

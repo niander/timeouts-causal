@@ -91,7 +91,7 @@ plt <- timeout.data %>%
 
 plt
 
-SaveGraph("stmc-dist.pdf", height = 3.5)
+#SaveGraph("stmc-dist.pdf", height = 3.5)
 
 timeout.data %>%
   group_by(delta) %>%

@@ -1,3 +1,80 @@
+JoinMatchesWithData <- function(mat.data, data,
+                                vars.from.treatment = as.character(.(poss, team, opponent))) {
+  mat.data %<>%
+    left_join(data, by = c("delta", "season", "game.id", "poss.id")) %>% 
+    select(-ends_with(".y")) %>%
+    rename_at(vars(ends_with(".x")), funs(str_remove(., ".x")))
+  
+  if (!is.null(vars.from.treatment)) {
+    treats.vars <- mat.data %>%
+      filter(A == 1, !is.na(match.id)) %>%
+      arrange(match.id) %>%
+      select(!!!vars.from.treatment)
+    
+    control.matched.id <- mat.data %>%
+      mutate(id = row_number()) %>%
+      filter(A == 0, !is.na(match.id)) %>%
+      arrange(match.id) %>%
+      pull(id)
+    
+    mat.data[control.matched.id, vars.from.treatment] <- treats.vars
+    # mat.data %<>%
+    #   group_by(match.id) %>%
+    #   summarise_at(vars(!!!vars.from.treatment), funs(extract2(., which(A == 1)))) %>%
+    #   right_join(mat.data, by = "match.id") %>%
+    #   rename_at(vars(ends_with(".x")), funs(str_remove(., ".x"))) %>%
+    #   select(-ends_with(".y"))
+  }
+  
+  return(mat.data)
+}
+
+JoinMatDataFromDeltasAndMethods <- function(years = config$seasons,
+                                            methods = c("nobal", "maha", "propensity.nocalip"),
+                                            deltas = config$deltas) {
+  
+  crossing(methods, years) %$%
+    walk2(methods, years, function(m, y) {
+      env_bind(global_env(),
+               !!str_c("res", m, sep = ".") :=
+                 crossing(dd = str_c("delta", deltas), yy = years) %$%
+                 map2_dfr(dd, yy, function(dd, yy) {
+                   objname <- str_c("res", m, dd, yy, sep = ".")
+                   if (!env_has(global_env(), nms = objname)) {
+                     inform(str_c(objname, "not found in global env", sep = " "))
+                     objname <- str_c("res", m, dd, sep = ".")
+                     if (env_has(global_env(), nms = objname)) {
+                       inform(str_c("However,", objname, "found in global env", sep = " "))
+                       return(env_get(global_env(), objname)$mat.data)
+                     } else {
+                       inform(str_c(objname, "not found in global env", sep = " "))
+                       return(zap())
+                     }
+                   } else {
+                     return(env_get(global_env(), objname)$mat.data)
+                   }
+                 })
+      )
+    })
+}
+
+JoinAllMatchesAndDeltaWithData <- function(years = config$seasons, 
+                                           methods = c("nobal", "maha", "propensity.nocalip"),
+                                           deltas = config$deltas,
+                                           data, ...) {
+  JoinMatDataFromDeltasAndMethods(years, methods, deltas)
+  
+  walk(methods, function(m) {
+    nm <- str_c("res", m, sep = ".")
+    if(env_has(global_env(), nm)) {
+      mat.data <- JoinMatchesWithData(env_get(global_env(), nm), data, ...)
+      env_bind(global_env(), !!str_c("mat", m, sep = ".") := mat.data)
+    } else {
+      inform(str_glue("{nm} was not found in global env"))
+    }
+  })
+}
+
 PrintTableOnes <- function(df, xvars = .(slope.before, quarter, seconds, margin), just_home = T) {
   tabones <- list()
   i <- 1
@@ -152,7 +229,8 @@ GetPValues <- function(df, get.ci = TRUE, filter.home = TRUE, separate.effects =
   
   if(get.ci) {
     aux.df %<>%
-      do(bind_cols(get_ci(.$nulldist.diff),
+      do(bind_cols(get_ci(.$nulldist.diff, level = 0.99, type = "se", point_estimate = .$obs.diff) %>% 
+                     set_names(c("ci.min", "ci.max")),
                    get_pvalue(.$nulldist.diff, .$obs.diff, "both")))
   } else {
     aux.df %<>%
@@ -170,10 +248,12 @@ GetPValues <- function(df, get.ci = TRUE, filter.home = TRUE, separate.effects =
     if(separate.effects) {
       aux.df %<>%
         complete(method, delta, match.poss) %>%
-        nest(obs.diff, p_value, .key = "dn") %>%
-        spread(match.poss, dn) %>%
-        unnest(.sep = ".")
+        pivot_wider(names_from = match.poss, values_from = c("obs.diff", "p_value", "ci.min", "ci.max"), names_sep = ".")
     }
   }
   return(aux.df)
+}
+
+ClearWorkspaceWithLoadedDatasets <- function() {
+  env_unbind(global_env(), project.info$data)
 }

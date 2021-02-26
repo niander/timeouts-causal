@@ -5,3 +5,6 @@
 
 cache/
 !cache/README.md
+
+reports/latex*.txt
+reports/*.nb.html

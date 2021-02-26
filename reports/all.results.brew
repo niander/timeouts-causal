@@ -1,0 +1,18 @@
+\begin{tabular}{llcccc} \toprule
+  $\lambda$ & Method & \TEaway & 99\% CI & \TEhome & 99\% CI \\ \midrule
+  
+  <% for(d_i in 1:length(deltas)) { -%>
+  <%= deltas[[d_i]] -%>
+  <% for(m_i in 1:length(themethods)) { -%>
+  <% data <- filter(tab, method == themethods[[m_i]], delta == deltas[[d_i]]) -%>
+& <%= tab.methods[[m_i]] %> & <%= format(pull(data, obs.diff_away),nsmall=3) -%>
+& (<%= format(pull(data, ci.min_away),nsmall=3) %>, <%= format(pull(data, ci.max_away),nsmall=3) %>)
+& <%= format(pull(data, obs.diff_home),nsmall=3) -%>
+& (<%= format(pull(data, ci.min_home),nsmall=3) %>, <%= format(pull(data, ci.max_home),nsmall=3) %>) \\ 
+  <% } -%>
+  <% if(d_i < length(deltas)) { -%> 
+  \midrule
+  <% } -%>
+  <% } -%> 
+  \bottomrule
+  \end{tabular}%

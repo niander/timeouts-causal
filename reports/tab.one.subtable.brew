@@ -1,0 +1,43 @@
+\begin{tabular}{*{10}{c}} \toprule
+&  & \multicolumn{2}{c}{$n$}
+       & \multicolumn{3}{c}{$\stmcB$ (mean(sd))} 
+       & \multicolumn{3}{c}{\Seconds (mean(sd))} \\
+    \cmidrule(lr){3-4}
+    \cmidrule(lr){5-7}
+    \cmidrule(lr){8-10}
+    $\lambda$ & Method & $A_t=0$ & $A_t=1$
+        & $A_t=0$ & $A_t=1$ & SMD
+        & $A_t=0$ & $A_t=1$ & SMD \\ \midrule
+    <% for (i in 1:length(tab.deltas)) { -%>
+    <% tab <- tab.ones[[i]] -%>
+    <%= if (i %% qtd.methods == 1) tab.deltas[[i]] else '' %> & <%= tab.methods[[i]] %> & <%= tab[1,1] %> & <%= tab[1,2] %> 
+    & <%= tab[2,1] %> & <%= tab[2,2] %> & <%= tab[2,3] %> 
+    & <%= tab[3,1] %> & <%= tab[3,2] %> & <%= tab[3,3] %> \\
+    <% if (i %% qtd.methods == 0 && i < length(tab.methods)) { -%> 
+    \midrule
+    <% } -%>
+    <% } -%>
+   \bottomrule
+\end{tabular}%
+
+\begin{tabular}{*{10}{c}} \toprule
+&  & \multicolumn{2}{c}{$n$}
+      & \multicolumn{3}{c}{\Period (mean(sd))} 
+      & \multicolumn{3}{c}{\ScorMar (mean(sd))} \\
+    \cmidrule(lr){3-4}
+    \cmidrule(lr){5-7}
+    \cmidrule(lr){8-10}
+    $\lambda$ & Method & $A_t=0$ & $A_t=1$
+        & $A_t=0$ & $A_t=1$ & SMD
+        & $A_t=0$ & $A_t=1$ & SMD \\ \midrule
+    <% for (i in 1:length(tab.deltas)) { -%>
+    <% tab <- tab.ones[[i]] -%>
+    <%= if (i %% qtd.methods == 1) tab.deltas[[i]] else '' %> & <%= tab.methods[[i]] %> & <%= tab[1,1] %> & <%= tab[1,2] %> 
+    & <%= tab[4,1] %> & <%= tab[4,2] %> & <%= tab[4,3] %>
+    & <%= tab[5,1] %> & <%= tab[5,2] %> & <%= tab[5,3] %> \\
+    <% if (i %% qtd.methods == 0 && i < length(tab.methods)) { -%> 
+    \midrule
+    <% } -%>
+    <% } -%>
+   \bottomrule
+\end{tabular}%

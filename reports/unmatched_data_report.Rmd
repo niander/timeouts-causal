@@ -1,0 +1,140 @@
+---
+title: "unmatched_data"
+author: "Niander Assis"
+date:
+output: 
+  html_document:
+    fig_width: 9
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE, vspaceecho = "1em", vspaceout = "1em")
+knitr::opts_knit$set(root.dir = rprojroot::find_root(rprojroot::is_rstudio_project))
+
+hook_source_def = knitr::knit_hooks$get('source')
+knitr::knit_hooks$set(source = function(x, options) {
+  if (!is.null(options$vspaceecho)) {
+    begin <- paste0("\\vspace{", options$vspaceecho, "}")
+    stringr::str_c(begin, hook_source_def(x, options))
+  } else {
+    hook_source_def(x, options)
+  }
+})
+
+hook_output_def = knitr::knit_hooks$get('output')
+knitr::knit_hooks$set(output = function(x, options) {
+  if (!is.null(options$vspaceout)) {
+    end <- paste0("\\vspace{", options$vspaceout, "}")
+    stringr::str_c(hook_output_def(x, options), end)
+  } else {
+    hook_output_def(x, options)
+  }
+})
+
+```
+
+```{r source, echo = FALSE, include = FALSE}
+library(ProjectTemplate)
+load.project(data_loading = FALSE, seasons = c(2017))
+
+library(brew)
+
+```
+
+
+```{r summary}
+
+p <- c(0, 0.25, 0.5, 0.75, 1)
+p_names <- map_chr(p, ~ as.character(.x*100))
+p_funs <- map(p, ~partial(quantile, probs = .x, na.rm = TRUE)) %>% 
+  set_names(nm = p_names)
+p_funs %<>% append(lst(mean, sd, length))
+
+
+```
+
+```{r timeouts}
+
+add_seconds <- . %>%
+  add_column(seconds = na_int, .after = 'time') %>%
+  mutate(seconds = as.integer(seconds(time)),
+         seconds = if_else(quarter <= 4, 12L*60L - seconds, 5L*60L - seconds))
+
+g.infl <- games.inflscore %>% 
+  add_seconds %>%
+  select(-time, -pts)
+
+tidy_summarise <- . %>%
+  summarize_at(vars(quarter, seconds, margin, slope.before), lst(!!!p_funs)) %>%
+  pivot_longer(cols = matches("_"), names_to = "var_s", values_to = "value") %>%
+  separate(var_s, into = c("var", "s"), sep = "_") %>%
+  pivot_wider(names_from = s, values_from = value) %>%
+  ungroup()
+
+tab.summ <- g.infl %>%
+  filter(!is.na(infl.score), valid.infl.score) %>%
+  filter(kind == "timeout") %>%
+  group_by(delta, poss) %>%
+  tidy_summarise()
+
+contr.tab.summ <- g.infl %>%
+  filter(!is.na(infl.score), valid.infl.score) %>%
+  filter(!kind %in% c("timeout", "official.timeout", "endquarter")) %>%
+  group_by(delta) %>%
+  tidy_summarise()
+
+
+```
+
+```{r}
+
+deltas <- config$deltas
+BrewTableSummary <- function(tab, suffix.name) {
+  tab %<>% mutate_if(is.numeric, round, digits = 3)
+  
+  brew.table.summary <- "\\begin{tabular}{*{10}{c}} \\toprule
+   $\\lambda$ & $n$ & Covariate & Min & 25\\% & 50\\% & 75\\% & Max & Mean (sd) \\\\ \\midrule
+  <% for(d in deltas) { -%>
+  <% data <- filter(tab, delta == d) -%>
+  <% for(i in 1:nrow(data)) { -%>
+  <%= if (i==1) d else '' %> & <%= if (i==1) data$length[i] else '' %> & <%= data$var[i] %> & <%= data$`0`[i] %> & <%= data$`25`[i] %> & <%= data$`50`[i] %> & <%= data$`75`[i] %> & <%= data$`100`[i] %> & <%= data$mean[i] %> (<%= data$sd[i] %>) \\\\
+  <% } %>
+  <% if (d != deltas[[length(deltas)]]) {-%> 
+    \\midrule
+  <% } -%>
+  <% } -%>
+  \\bottomrule
+  \\end{tabular}%"
+  
+  brew(text = brew.table.summary, output = path("reports", str_c("latex.table.summary", suffix.name, "txt", sep = ".")))
+}
+
+rename_vars_to_latex <- . %>%
+  mutate_at(vars(var), 
+            ~ plyr::revalue(.x, 
+                            replace = c("quarter" = "\\Period",
+                                        "seconds" = "\\Seconds",
+                                        "margin" = "\\ScorMar",
+                                        "slope.before" = "\\stmcB")))
+
+tab.summ %>%
+  filter(poss == "home") %>%
+  rename_vars_to_latex() %>%
+  BrewTableSummary("timeouts.home")
+
+tab.summ %>%
+  filter(poss == "away") %>%
+  rename_vars_to_latex() %>%
+  BrewTableSummary("timeouts.away")
+
+contr.tab.summ %>%
+  rename_vars_to_latex() %>%
+  BrewTableSummary("control")
+
+```
+
+
+

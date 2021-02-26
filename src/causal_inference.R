@@ -377,7 +377,7 @@ RunAllMatches <- function(data) {
 # RunAllMatches(delta6.2015)
 
 
-#######################
+####
 
 # data <- PrepareData(res.timeout.effect.data) %>%
 #   filter(season %in% c("2015", "2016", "2017", "2018"))
@@ -388,112 +388,40 @@ RunAllMatches <- function(data) {
 # 
 # cenv <- current_env()
 # lst(delta2, delta4, delta6) %>%
-#   iwalk(~ .x %>% 
+#   iwalk(~ .x %>%
 #           filter(quarter == 4, seconds >= 420) %>% # Last 5 min
 #           { env_bind(cenv, !!str_c("last5min", .y, sep = ".") := .) })
 # 
 # RunAllMatches(last5min.delta2)
 # RunAllMatches(last5min.delta4)
 # RunAllMatches(last5min.delta6)
+# 
+# rm(data, delta2, delta4, delta6,
+#    last5min.delta2, last5min.delta4, last5min.delta6)
 
-JoinMatchesWithData <- function(mat.data, data,
-                                vars.from.treatment = as.character(.(poss, team, opponent))) {
-  mat.data %<>%
-    left_join(data, by = c("delta", "season", "game.id", "poss.id")) %>% 
-    select(-ends_with(".y")) %>%
-    rename_at(vars(ends_with(".x")), funs(str_remove(., ".x")))
-  
-  if (!is.null(vars.from.treatment)) {
-    treats.vars <- mat.data %>%
-      filter(A == 1, !is.na(match.id)) %>%
-      arrange(match.id) %>%
-      select(!!!vars.from.treatment)
-    
-    control.matched.id <- mat.data %>%
-      mutate(id = row_number()) %>%
-      filter(A == 0, !is.na(match.id)) %>%
-      arrange(match.id) %>%
-      pull(id)
-    
-    mat.data[control.matched.id, vars.from.treatment] <- treats.vars
-    # mat.data %<>%
-    #   group_by(match.id) %>%
-    #   summarise_at(vars(!!!vars.from.treatment), funs(extract2(., which(A == 1)))) %>%
-    #   right_join(mat.data, by = "match.id") %>%
-    #   rename_at(vars(ends_with(".x")), funs(str_remove(., ".x"))) %>%
-    #   select(-ends_with(".y"))
-  }
-  
-  return(mat.data)
-}
+#####
 
-JoinMatDataFromDeltasAndMethods <- function(years = config$seasons,
-                             methods = c("nobal", "propensity.nocalip"),
-                             deltas = config$deltas) {
-  
-  crossing(methods, years) %$%
-    walk2(methods, years, function(m, y) {
-      env_bind(global_env(),
-               !!str_c("res", m, sep = ".") :=
-                 crossing(dd = str_c("delta", deltas), yy = years) %$%
-                 map2_dfr(dd, yy, function(dd, yy) {
-                   objname <- str_c("res", m, dd, yy, sep = ".")
-                   if (!env_has(global_env(), nms = objname)) {
-                     inform(str_c(objname, "not found in global env", sep = " "))
-                     objname <- str_c("res", m, dd, sep = ".")
-                     if (env_has(global_env(), nms = objname)) {
-                       inform(str_c("However,", objname, "found in global env", sep = " "))
-                       return(env_get(global_env(), objname)$mat.data)
-                     } else {
-                       inform(str_c(objname, "not found in global env", sep = " "))
-                       return(zap())
-                     }
-                   } else {
-                     return(env_get(global_env(), objname)$mat.data)
-                   }
-                 })
-      )
-    })
-}
+# data <- PrepareData(res.timeout.effect.data) %>%
+#   filter(season == "2017")
+# delta2 <- data %>% filter(delta == 2)
+# delta4 <- data %>% filter(delta == 4)
+# delta6 <- data %>% filter(delta == 6)
+# 
+# cenv <- current_env()
+# lst(delta2, delta4, delta6) %>%
+#   iwalk(~ .x %>%
+#           filter(quarter <= 4) %>%
+#           filter(if_else(quarter == 4, seconds < 420, TRUE)) %>% # All but last 5 min
+#           { env_bind(cenv, !!str_c("but5min", .y, sep = ".") := .) })
+# 
+# RunAllMatches(but5min.delta2)
+# RunAllMatches(but5min.delta4)
+# RunAllMatches(but5min.delta6)
+# 
+# rm(data, delta2, delta4, delta6, 
+#    but5min.delta2, but5min.delta4, but5min.delta6)
 
-JoinAllMatchesAndDeltaWithData <- function(years = config$seasons, 
-                                           methods = c("nobal", "propensity.nocalip"),
-                                           deltas = config$deltas,
-                                           data, ...) {
-  JoinMatDataFromDeltasAndMethods(years, methods, deltas)
-  
-  walk(methods, function(m) {
-    nm <- str_c("res", m, sep = ".")
-    if(env_has(global_env(), nm)) {
-      mat.data <- JoinMatchesWithData(env_get(global_env(), nm), data, ...)
-      env_bind(global_env(), !!str_c("mat", m, sep = ".") := mat.data)
-    } else {
-      inform(str_glue("{nm} was not found in global env"))
-    }
-  })
-}
 
-env_bind(global_env(), JoinMatchesWithData = JoinMatchesWithData, 
-         JoinMatDataFromDeltasAndMethods = JoinMatDataFromDeltasAndMethods, 
-         JoinAllMatchesAndDeltaWithData = JoinAllMatchesAndDeltaWithData)
-
-# library(sensitivitymult)
-# 
-# JoinMatDataFromDeltasAndMethods()
-# 
-# mat.propensity.nocalip %>% filter(delta == 4, season == 2017, match.poss == "home") %$%
-#   senmCI(infl.score, A, match.id, trim = Inf, gamma = 10, twosided = T, TonT = T, alpha = 0.01)
-#   #senm(infl.score, A, match.id, trim = Inf, gamma = 1, alternative = "less", TonT = T, )
-# 
-# mat.propensity.nocalip %>% filter(delta == 6, season == 2017, match.poss == "home") %>%
-#   drop_na(match.id) %>%
-#   RunInferPermutation()# %>%
-#   #RIPListToDataFrame()
-# 
-# tdata <- mat.propensity.nocalip %>% filter(delta == 6, season == 2017, match.poss == "home") %>%
-#   mutate_at(vars(A), factor) %>%
-#   specify(infl.score ~ A)
-# 
-# tdata %>% calculate(stat = "diff in means", order = c("1", "0"))
-# 
-# tdata %>% group_by(A) %>% summarise(mean = mean(infl.score))
+# env_bind(global_env(), JoinMatchesWithData = JoinMatchesWithData, 
+#          JoinMatDataFromDeltasAndMethods = JoinMatDataFromDeltasAndMethods, 
+#          JoinAllMatchesAndDeltaWithData = JoinAllMatchesAndDeltaWithData)

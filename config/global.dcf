@@ -1,4 +1,4 @@
-version: 0.8.2
+version: 0.9.0
 data_loading: TRUE
 data_loading_header: TRUE
 data_ignore: pbp/,*.csv,*.txt
@@ -10,7 +10,7 @@ logging_level: INFO
 load_libraries: TRUE
 libraries: log4r, plyr, rlang, tidymodels, tidyverse, purrrlyr, magrittr, lubridate, fs
 as_factors: TRUE
-data_tables: FALSE
 attach_internal_libraries: FALSE
 cache_loaded_data: FALSE
 sticky_variables: NONE
+tables_type: tibble

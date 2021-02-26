@@ -1,0 +1,14 @@
+\begin{tabular}{cccc} \toprule
+  $\Gamma$ & Method & away.ci & home.ci \\ \midrule
+  <% for(g in gammas) { -%>
+  <%= g -%>
+  <% for(m in methods) { -%>
+  <% data <- filter(tab, method == m, gamma == g) -%>
+  & <%= m %> 
+  & (<%= format(pull(data, ci.min_away),nsmall=3)%>, <%= format(pull(data, ci.max_away),nsmall=3) %>)
+  & (<%= format(pull(data, ci.min_home),nsmall=3)%>, <%= format(pull(data, ci.max_home),nsmall=3) %>) \\
+  <% } -%>
+  <% if (g != gammas[[length(gammas)]]) { -%> \midrule <% } -%>
+  <% } -%>
+  \bottomrule
+\end{tabular}%
